@@ -1,260 +1,121 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import '../css/styles.css';
-import '../css/bootstrap.min.css';
-import '../css/bootstrap-icons.css';
+import { useEffect, useState } from "react";
+import Navbar from "../product/Navbar"
+import { ShopAction, getShopByUsernameAsyncApi } from "../services/shop/shopSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { cartAction } from "../services/cart/cartSlice";
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+import { GetListProductOfSaleAsyncApi, ProductAction } from "../services/product/productSlice";
+import SimpleSlider from "./SimpleSlider";
+import { EventAction, getEventImgListAsyncApi } from "../services/event/eventSlice";
+import { accountAction } from "../services/account/accountSlice";
+import { CardAction } from "../services/card/cardSlice";
 
-const ShopOrder = () => {
+export default function ShopOrder() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
+  const userString = localStorage.getItem("user");
+  const userObject = JSON.parse(userString);
+  const dispatch = useDispatch();
+  const { ProductOfSale } = useSelector((state) => state.product)
+  const { arrCart } = useSelector((state) => state.cart)
+  const handleClickAddToCart = (index) => {
+    dispatch(cartAction.addTocart(
+      {
+        quantity: parseInt(filteredData[index].quantity),
+        name: filteredData[index].name,
+        price: filteredData[index].price,
+        category: filteredData[index].category,
+        id: filteredData[index].id,
+        image: filteredData[index].img,
+      }
+    ))
+  };
+
+  console.log("cart", arrCart)
+
+  useEffect(() => {
+    dispatch(getShopByUsernameAsyncApi(userObject.username)).then((response) => {
+      if (response.payload != undefined) {
+        dispatch(GetListProductOfSaleAsyncApi(response.payload.id)).then((response) => {
+          if (response.payload != undefined) {
+            const updatedArr = response.payload.map(item => {
+              return {
+                ...item,  // Giữ nguyên các thuộc tính hiện có
+                quantity: 0  // Thêm thuộc tính mới
+              };
+            });
+            setFilteredData(updatedArr)
+          }
+        }).catch((error) => {
+        });
+        dispatch(getEventImgListAsyncApi(response.payload.eventId)).then((response) => {
+          if (response.payload != undefined) {
+          }
+        }).catch((error) => {
+          // Handle failure case
+        });
+      }
+    }).catch((error) => {
+    });
+    return () => {
+      dispatch(accountAction.clearAccount())
+      dispatch(CardAction.clearCard())
+      dispatch(EventAction.clearEvent())
+      dispatch(ProductAction.clearProduct())
+      dispatch(ShopAction.clearShop())
+    }
+  }, []);
+
+
+  const handleChange = (e, data, index) => {
+
+    if (e.target.value > 10) {
+    } else {
+      const newArrayList = [...filteredData];
+      newArrayList[index].quantity = e.target.value;
+      setFilteredData(newArrayList);
+    }
+
+  };
+  console.log("adx", filteredData)
   return (
-    <div>
-      <header className="navbar sticky-top" style={{ alignItems: "center" }}>
-        <Link to="shoporder">
-          <img style={{ width: "100px" }} src="images/logo EIPS.png" alt="" />
-        </Link>
-        <Link className="nav-link" to="/shoporder">
-          <i className="bi-wallet me-2" />
-          Shop Order
-        </Link>
-        <Link className="nav-link" to="/product">
-          <i className="bi-wallet me-2" />
-          Product
-        </Link>
-        <Link className="nav-link" to="/setting">
-          <i className="bi-gear me-2" />
-          Settings
-        </Link>
-        <Link className="nav-link" to="#">
-          <i className="bi-box-arrow-left me-2" />
-          Logout
-        </Link>
-        <div className="px-3">
-          <Link
-            to="#"
-            role="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            <img
-              src="images/medium-shot-happy-man-smiling.jpg"
-              className="profile-image"
-              alt=""
-            />
-          </Link>
-        </div>
-      </header>
-        <div className="row" sx={{position: "fixed"}}>
-            <div className="title-group mb-3" style={{ textAlign: "center" }}>
-              <h1 className="h2 mb-0">MENU</h1>
-              <small className="text-muted">Hello Hao Phan, welcome back!</small>
-            </div>
-            <div className="row my-4">
-              <div className="col-lg-6 col-12">
-                <form
-                  className="custom-form input-group mb-3"
-                  action="#"
-                  method="get"
-                  role="form"
-                >
-                  <input
-                    className="form-control"
-                    name="search"
-                    type="text"
-                    placeholder="Search ID"
-                    aria-label="Search"
-                  />
-                  <button style={{ width: "100px" }} type="submit">
-                    Search
-                  </button>
-                </form>
-                <form
-                  className="custom-form input-group mb-3"
-                  action="#"
-                  method="get"
-                  role="form"
-                >
-                  <input
-                    className="form-control"
-                    name="search"
-                    type="text"
-                    placeholder="Search Product"
-                    aria-label="Search"
-                  />
-                  <button style={{ width: "100px" }} type="submit">
-                    Search
-                  </button>
-                </form>
-                <div className="custom-block bg-white">
-                  <h5 className="mb-4">Product</h5>
-                  <div className="table-responsive">
-                    <table
-                      className="account-table table"
-                      style={{ textAlign: "center" }}
-                    >
-                      <thead>
-                        <tr>
-                          <th scope="col">ID</th>
-                          <th scope="col">Name</th>
-                          <th scope="col">Image</th>
-                          <th scope="col">Description</th>
-                          <th scope="col">Price</th>
-                          <th scope="col">Category</th>
-                          <th scope="col">Add to cart</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td scope="row">1</td>
-                          <td scope="row"></td>
-                          <td scope="row"></td>
-                          <td scope="row"></td>
-                          <td scope="row"></td>
-                          <td className="text-danger" scope="row">
-                            <span className="me-1">-</span>
-                          </td>
-                          <td scope="row" style={{ alignItems: "center" }}>
-                            <button className="form-control">Add</button>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td scope="row">2</td>
-                          <td scope="row"></td>
-                          <td scope="row"></td>
-                          <td scope="row"></td>
-                          <td scope="row"></td>
-                          <td className="text-success" scope="row">
-                            <span className="me-2"></span>
-                          </td>
-                          <td scope="row" style={{ alignItems: "center" }}>
-                            <button className="form-control">Add</button>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td scope="row">3</td>
-                          <td scope="row"></td>
-                          <td scope="row"></td>
-                          <td scope="row"></td>
-                          <td scope="row"></td>
-                          <td className="text-danger" scope="row">
-                            <span className="me-2"></span>
-                          </td>
-                          <td scope="row" style={{ alignItems: "center" }}>
-                            <button className="form-control">Add</button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+    <div className="bg-white">
+      <Navbar />
+      <SimpleSlider />
+      <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+        <h3 className=" font-bold  mb-0">PRODUCT</h3>
+        <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 ">
+          {filteredData.map((product, index) => (
+            <div key={index} className="  border-2 p-2 ">
+              <div className=" w-full overflow-hidden rounded-md bg-gray-200  group-hover:opacity-75 lg:h-80">
+                <img
+                  src={product.imageSrc}
+                  alt={product.imageAlt}
+                  className="h-full w-full object-cover object-center lg:h-full lg:w-full"
+                />
               </div>
-              <div className="col-lg-6 col-12">
-                <table
-                  className="account-table table"
-                  style={{ textAlign: "center" }}
-                >
-                  <thead>
-                    <tr>
-                      <th scope="col">ID</th>
-                      <th scope="col">ID Event</th>
-                      <th scope="col">User Name</th>
-                      <th scope="col">Phone Number</th>
-                      <th scope="col">Balance</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr style={{ textAlign: "center" }}>
-                      <td scope="row">1</td>
-                      <td scope="row"></td>
-                      <td scope="row"></td>
-                      <td scope="row"></td>
-                      <td scope="row"></td>
-                    </tr>
-                  </tbody>
-                </table>
-                <div className="custom-block bg-white">
-                  <h5 className="mb-4">Cart</h5>
-                  <div className="table-responsive">
-                    <table
-                      className="account-table table"
-                      style={{ textAlign: "center" }}
-                    >
-                      <thead>
-                        <tr>
-                          <th scope="col">ID</th>
-                          <th scope="col">Name</th>
-                          <th scope="col">Image</th>
-                          <th scope="col">Description</th>
-                          <th scope="col">Price</th>
-                          <th scope="col">Quantity</th>
-                          <th scope="col">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td scope="row">1</td>
-                          <td scope="row"></td>
-                          <td scope="row"></td>
-                          <td scope="row"></td>
-                          <td scope="row"></td>
-                          <td scope="row">
-                            <a href="">
-                              <i className="bi bi-caret-left-fill"></i>
-                            </a>
-                            1
-                            <a href="">
-                              <i className="bi bi-caret-right-fill"></i>
-                            </a>
-                          </td>
-                          <td scope="row"></td>
-                        </tr>
-                        <tr>
-                          <td scope="row">2</td>
-                          <td scope="row"></td>
-                          <td scope="row"></td>
-                          <td scope="row"></td>
-                          <td scope="row"></td>
-                          <td scope="row">
-                            <a href="">
-                              <i className="bi bi-caret-left-fill"></i>
-                            </a>
-                            1
-                            <a href="">
-                              <i className="bi bi-caret-right-fill"></i>
-                            </a>
-                          </td>
-                          <td scope="row"></td>
-                        </tr>
-                        <tr>
-                          <td scope="row">3</td>
-                          <td scope="row"></td>
-                          <td scope="row"></td>
-                          <td scope="row"></td>
-                          <td scope="row"></td>
-                          <td scope="row">
-                            <a href="">
-                              <i className="bi bi-caret-left-fill"></i>
-                            </a>
-                            1
-                            <a href="">
-                              <i className="bi bi-caret-right-fill"></i>
-                            </a>
-                          </td>
-                          <td scope="row"></td>
-                        </tr>
-                        <tr>
-                          <td scope="row" colSpan="6" style={{ textAlign: "right" }}>
-                            Total
-                          </td>
-                          <td scope="row"></td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
+              <div className="mt-4 flex justify-between">
+                <div>
+                  <h3 className="text-sm text-gray-700">
+                    <span aria-hidden="true" className=" inset-0" />
+                    {product.name}
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-500">{product.category}</p>
+                </div>
+                <p className="text-sm font-medium text-gray-900">{product.price}</p>
+              </div>
+              <div className="mt-2 flex relative z-10 justify-between">
+                <div onClick={() => handleClickAddToCart(index)} className="cursor-pointer">
+                  <ShoppingCartOutlinedIcon className="mt-[6px]" />
+                </div>
+                <div>
+                  <input type="number" value={filteredData[index].quantity} onChange={(e) => handleChange(e, product, index)} className="cursor-pointer form-control" />
                 </div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
-  );
-};
-
-export default ShopOrder;
+      </div>
+    </div>
+  )
+}

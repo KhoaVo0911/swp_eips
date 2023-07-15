@@ -1,253 +1,362 @@
-// import React from 'react';
-// import '../css/styles.admin.css';
+import React, { useEffect, useState } from 'react';
+import '../css/styles.admin.css';
+import { Link, useLocation, useParams } from 'react-router-dom';
+import { PostShopAsyncApi, ShopAction, getShopAsyncApi } from '../services/shop/shopSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import PublicIcon from '@mui/icons-material/Public';
+import PublicOffIcon from '@mui/icons-material/PublicOff';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+import ViewCarouselIcon from '@mui/icons-material/ViewCarousel';
+import { Tooltip } from '@mui/material';
+import IconButton from "@mui/material/IconButton";
+import Slide from '@mui/material/Slide';
+import { useFormik } from 'formik';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import TextField from '@mui/material/TextField';
+import * as Yup from "yup";
+import { CardAction, PostCard50AsyncApi, PostCardAsyncApi } from '../services/card/cardSlice';
+import { PostRevenueAsyncApi, ProductAction, getProductAsyncApi } from '../services/product/productSlice';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { GetAccountNotRelationAsyncApi, PostAccountAsyncApi, PostShopAccountSetAsyncApi, accountAction } from '../services/account/accountSlice';
+import {
+  InputLabel,
+  MenuItem,
+  Select,
+  FormControl
+} from "@mui/material";
+import dayjs from 'dayjs';
+import Navbar from './Navbar';
+import { EventAction } from '../services/event/eventSlice';
 
-// function ShopAdmin() {
-//     return (
-//       <div>
-//         <header className="navbar sticky-top" style={{ alignItems: 'center' }}>
-//           <a href="Admin.html">
-//             <img style={{ width: '100px' }} src="images/logo EIPS.png" alt="" />
-//           </a>
-//           <a className="nav-link" href="Admin.html">
-//             <i className="bi-wallet me-2"></i>
-//             Event
-//           </a>
-//           <a className="nav-link" href="AccountAdmin.html">
-//             <i className="bi bi-person-circle"></i>
-//             Account
-//           </a>
-//           <a className="nav-link" href="setting.html">
-//             <i className="bi-gear me-2"></i>
-//             Setting
-//           </a>
-//           <a className="nav-link" href="#">
-//             <i className="bi-box-arrow-left me-2"></i>
-//             Logout
-//           </a>
-//           <div className="px-3">
-//             <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-//               <img src="images/medium-shot-happy-man-smiling.jpg" className="profile-image" alt="" />
-//             </a>
-//           </div>
-//         </header>
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
-//         <div className="container-fluid">
-//           <div className="row">
-//             <main className="main-wrapper ms-sm-auto py-4 px-md-4 border-start">
-//               <div className="row my-4">
-//                 <div className="col-lg-6 col-6">
-//                   <div className="title-group mb-3" style={{ textAlign: 'center' }}>
-//                     <h1 className="h2 mb-0">Name Shop</h1>
-//                     <small className="text-muted"></small>
-//                   </div>
-//                 </div>
-//                 <div className="col-lg-6 col-6" style={{ paddingRight: '300px' }}>
-//                   <form className="custom-form input-group mb-3" action="#" method="get" role="form">
-//                     <input className="form-control" name="search" type="text" placeholder="Search" aria-label="Search" />
-//                     <button style={{ width: '100px' }} type="submit">
-//                       Search
-//                     </button>
-//                   </form>
-//                   <div>
-//                     <a className="nav-link form-control mb-3" style={{ textAlign: 'center' }} href="CreateAccount.html">
-//                       Create Account
-//                     </a>
-//                   </div>
-//                   <div>
-//                     <a className="nav-link form-control mb-3" style={{ textAlign: 'center' }} href="CreateAccount.html">
-//                       Set Account Shop
-//                     </a>
-//                   </div>
-//                 </div>
-//               </div>
-//               <div className="row my-4">
-//                 <div className="custom-block bg-white">
-//                   <h5 className="mb-4" style={{ textAlign: 'center' }}>Product</h5>
-
-//                   <div className="table-responsive">
-//                     <table className="account-table table" style={{ textAlign: 'center' }}>
-//                       <thead>
-//                         <tr>
-//                           <th scope="col">ID</th>
-//                           <th scope="col">Name</th>
-//                           <th scope="col">Image</th>
-//                           <th scope="col">Description</th>
-//                           <th scope="col">Price</th>
-//                           <th scope="col">Category</th>
-//                         </tr>
-//                       </thead>
-//                       <tbody>
-//                         <tr>
-//                           <td scope="row">1</td>
-//                           <td scope="row"></td>
-//                           <td scope="row"></td>
-//                           <td scope="row"></td>
-//                           <td scope="row"></td>
-//                           <td className="text-danger" scope="row">
-//                             <span className="me-1">-</span>
-//                           </td>
-//                         </tr>
-//                         <tr>
-//                           <td scope="row">2</td>
-//                           <td scope="row"></td>
-//                           <td scope="row"></td>
-//                           <td scope="row"></td>
-//                           <td scope="row"></td>
-//                           <td className="text-success" scope="row">
-//                             <span className="me-2"></span>
-//                           </td>
-//                         </tr>
-//                         <tr>
-//                           <td scope="row">3</td>
-//                           <td scope="row"></td>
-//                           <td scope="row"></td>
-//                           <td scope="row"></td>
-//                           <td scope="row"></td>
-//                           <td className="text-danger" scope="row">
-//                             <span className="me-2"></span>
-//                           </td>
-//                         </tr>
-//                       </tbody>
-//                     </table>
-//                   </div>
-//                   <li style={{ listStyle: 'none' }}>Total Revenue: 123</li>
-//                 </div>
-//               </div>
-//               <div className="col-2">
-//                 <a className="nav-link form-control mb-3" style={{ textAlign: 'center' }} href="EventAdmin.html">
-//                   Previous
-//                 </a>
-//               </div>
-//             </main>
-//           </div>
-//         </div>
-//       </div>
-//     );
-// }
-
-// export default ShopAdmin;
+function parseToVND(number) {
+  let strNumber = number.toString().replace(/[.,]/g, "");
+  strNumber = strNumber.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return strNumber;
+}
 
 
-<div>
-  <meta charSet="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content />
-  <meta name="author" content />
-  <title>ShopAdmin</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin />
-  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;700&display=swap" rel="stylesheet" />
-  <link href="css/bootstrap.min.css" rel="stylesheet" />
-  <link href="css/bootstrap-icons.css" rel="stylesheet" />
-  <link href="css/styles.admin.css" rel="stylesheet" />
-  <header className="navbar sticky-top" style={{alignItems: 'center'}}>
-    <a href="Admin.html">
-      <img style={{width: 100}} src="images/logo EIPS.png" alt />
-    </a>
-    <a className="nav-link" href="Admin.html">
-      <i className="bi-wallet me-2" />
-      Event
-    </a>
-    <a className="nav-link" href="AccountAdmin.html">
-      <i className="bi bi-person-circle" />
-      Account
-    </a>
-    <a className="nav-link" href="setting.html">
-      <i className="bi-gear me-2" />
-      Setting
-    </a>
-    <a className="nav-link" href="#">
-      <i className="bi-box-arrow-left me-2" />
-      Logout
-    </a>
-    <div className="px-3">
-      <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-        <img src="images/medium-shot-happy-man-smiling.jpg" className="profile-image" alt />
-      </a>
-    </div>
-  </header>
-  <div className="container-fluid">
-    <div className="row">
-      <main className="main-wrapper ms-sm-auto py-4 px-md-4 border-start">
-        <div className="row my-4">
-          <div className="col-lg-6 col-6">
-            <div className="title-group mb-3" style={{textAlign: 'center'}}>
-              <h1 className="h2 mb-0">Name Shop</h1>
-              <small className="text-muted" />
-            </div>
-          </div>
-          <div className="col-lg-6 col-6" style={{paddingRight: 300}}>
-            <form className="custom-form input-group mb-3" action="#" method="get" role="form">
-              <input className="form-control" name="search" type="text" placeholder="Search" aria-label="Search" />
-              <button style={{width: 100}} type="submit">
-                Search
-              </button>
-            </form>
-            <div>
-              <a className="nav-link form-control mb-3" style={{textAlign: 'center'}} href="CreateAccount.html">
-                Create Account
-              </a>
-            </div>
-          </div>
-          <div className="row my-4">
-            <div className="custom-block bg-white">
-              <h5 className="mb-4" style={{textAlign: 'center'}}>Product</h5>
-              <div className="table-responsive">
-                <table className="account-table table" style={{textAlign: 'center'}}>
-                  <thead>
-                    <tr>
-                      <th scope="col">ID</th>
-                      <th scope="col">Name</th>
-                      <th scope="col">Image</th>
-                      <th scope="col">Description</th>
-                      <th scope="col">Price</th>
-                      <th scope="col">Catagory</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td scope="row">1</td>
-                      <td scope="row" />
-                      <td scope="row" />
-                      <td scope="row" />
-                      <td scope="row" />
-                      <td className="text-danger" scope="row">
-                        <span className="me-1">-</span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td scope="row">2</td>
-                      <td scope="row" />
-                      <td scope="row" />
-                      <td scope="row" />
-                      <td scope="row" />
-                      <td className="text-success" scope="row">
-                        <span className="me-2" />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td scope="row">3</td>
-                      <td scope="row" />
-                      <td scope="row" />
-                      <td scope="row" />
-                      <td scope="row" />
-                      <td className="text-danger" scope="row">
-                        <span className="me-2" />
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+function ShopAdmin() {
+  const param = useParams();
+  console.log("haha", param)
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
+  const [open, setOpen] = React.useState(false);
+  const [openSet, setOpenSet] = React.useState(false);
+
+  const [selectedDateStart, setSelectedDateStart] = useState(null);
+  const [selectedDateEnd, setSelectedDateEnd] = useState(null);
+  const [accountSet, setAccountSet] = useState('');
+  console.log("accountset", accountSet)
+  const location = useLocation();
+  const additionalData = location.state;
+  console.log('location', location);
+  const handleDateStartChange = (date) => {
+    const day = dayjs(date).format('YYYY-MM-DD');
+    setSelectedDateStart(day);
+  };
+  const handleDateEndChange = (date) => {
+    const day = dayjs(date).format('YYYY-MM-DD');
+    setSelectedDateEnd(day);
+  };
+
+  const dispatch = useDispatch();
+  const { ProductList, Revenue } = useSelector((state) => state.product)
+  const { AccountNotRelation } = useSelector((state) => state.acc)
+  useEffect(() => {
+    dispatch(GetAccountNotRelationAsyncApi())
+    dispatch(getProductAsyncApi(param.id)).then((response) => {
+      if (response.payload != undefined) {
+        setFilteredData(response.payload)
+      }
+    }).catch((error) => {
+    });
+    return () => {
+      dispatch(accountAction.clearAccount())
+      dispatch(CardAction.clearCard())
+      dispatch(EventAction.clearEvent())
+      dispatch(ProductAction.clearProduct())
+      dispatch(ShopAction.clearShop())
+    }
+  }, []);
+  useEffect(() => {
+    let body = { shopId: param.id, beginDate: selectedDateStart, endDate: selectedDateEnd }
+    dispatch(PostRevenueAsyncApi(body))
+    console.log("ngu123", selectedDateEnd, selectedDateStart)
+  }, [selectedDateEnd, selectedDateStart]);
+
+  console.log("haha1", ProductList)
+  const handleSetAccountShop = () => {
+    dispatch(PostShopAccountSetAsyncApi({ username: accountSet, shopId: param.id }))
+  };
+  function handleSearchInputChange(event) {
+    const query = event.target.value;
+    setSearchQuery(query);
+    filterData(query);
+  }
+  function filterData(query) {
+    const filteredResults = ProductList.filter((item) =>
+      item.name.toLowerCase().includes(query.toLowerCase())
+    );
+    setFilteredData(filteredResults);
+  }
+  const hanleClickCard = () => {
+    setOpenSet(!openSet)
+  };
+
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    formik.setValues(
+      {
+        id: "",
+        name: "",
+        description: "",
+        area: "",
+      }
+    );
+    formik.setTouched({});
+    formik.setErrors({});
+  };
+
+
+
+  const formik = useFormik({
+    initialValues: {
+      username: "",
+      password: "",
+      name: "",
+      role: "",
+    },
+    validationSchema: Yup.object({
+      username: Yup.string().min(2, "Too Short!").max(4000, "Too Long!").required(),
+      password: Yup.string().min(5, "Too Short!").max(4000, "Too Long!").required(),
+      name: Yup.string().min(5, "Too Short!").max(4000, "Too Long!").required(),
+      role: Yup.string().required(),
+    }), onSubmit: values => {
+      let DataBody
+
+      DataBody = {
+        username: values.username,
+        password: values.password,
+        name: values.name,
+        role: values.role,
+      }
+      dispatch(PostAccountAsyncApi(DataBody)).then((response) => {
+        setOpen(false);
+        formik.setValues(
+          {
+            username: "",
+            password: "",
+            name: "",
+            role: "",
+          }
+        );
+        formik.setTouched({});
+        formik.setErrors({});
+        if (response.payload != undefined) {
+          dispatch(getProductAsyncApi(param.id)).then((response) => {
+            if (response.payload != undefined) {
+              setFilteredData(response.payload)
+            }
+          }).catch((error) => {
+            // Handle failure case
+          });
+        }
+      }).catch((error) => {
+        // Handle failure case
+      });
+      console.log("ngu", DataBody)
+    },
+  });
+  return (
+    <div>
+      <Navbar />
+
+      <div className="container-fluid">
+        <div className="row">
+          <main className="main-wrapper ms-sm-auto py-4 px-md-4 border-start">
+            <div className="row my-4">
+              <div className="col-lg-6 col-6">
+                <div className="title-group mb-3" style={{ textAlign: 'center' }}>
+                  <h1 className="h2 mb-0">Name Shop</h1>
+                </div>
               </div>
-              <li style={{listStyle: 'none'}}>Total Revenue: 123</li>
+              <div className="col-lg-6 col-6" style={{ paddingRight: '300px' }}>
+                <form className="custom-form input-group mb-3" action="#" method="get" role="form">
+                  <input onChange={handleSearchInputChange} className="form-control" name="search" type="text" placeholder="Search" aria-label="Search" />
+                  <button style={{ width: '100px' }} type="submit">
+                    Search
+                  </button>
+                </form>
+                <div>
+                  <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={handleClickOpen}>
+                    Create Account
+                  </button>
+                </div>
+                <div>
+                  <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={hanleClickCard}>
+                    Set Account Shop
+                  </button>
+                  {
+                    openSet == true ? <>   <FormControl className="w-full bg-white mb-3">
+                      <InputLabel size="small">Account</InputLabel>
+                      <Select
+                        size="small"
+                        value={accountSet}
+                        onChange={(e) => setAccountSet(e.target.value)}
+                        label="Account"
+                      >
+                        {AccountNotRelation && AccountNotRelation.map((item, index) => {
+                          return (
+                            <MenuItem key={index} value={item.username}>{item.username}</MenuItem>
+                          )
+                        })}
+                      </Select>
+                    </FormControl>
+                      <Button onClick={handleSetAccountShop} variant='contained' className='mb-3'>
+                        submit
+                      </Button></> : null
+                  }
+
+                </div>
+              </div>
+
+              <div className="custom-block bg-white">
+                <div className='flex gap-5'>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      label="Start Date"
+                      value={selectedDateStart}
+                      onChange={handleDateStartChange}
+                    />
+                  </LocalizationProvider>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      label="End Date"
+                      value={selectedDateEnd}
+                      onChange={handleDateEndChange}
+                    />
+                  </LocalizationProvider>
+                  <div>
+                    <p className='text-2xl font-bold mt-[10px]'>Total Revenue: {parseToVND(Revenue) + " VNĐ"}</p>
+                  </div>
+                </div>
+
+                <h5 className="mb-4" style={{ textAlign: 'center' }}>Product</h5>
+
+                <div className="table-responsive">
+                  <table className="account-table table" style={{ textAlign: 'center' }}>
+                    <thead>
+                      <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Category</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredData && filteredData.map((item, index) => {
+                        return (
+                          <tr key={index}>
+                            <td>{item.id}</td>
+                            <td>{item.name}</td>
+                            <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                              <img className='w-32 h-32' src={item.img} alt="Product Image" />
+                            </td>
+                            <td>{item.description}</td>
+                            <td>{parseToVND(item.price) + " VNĐ"}</td>
+                            <td >
+                              {item.category}
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="col-2">
-            <a className="nav-link form-control mb-3" style={{textAlign: 'center'}} href="EventAdmin.html">
-              Previous
-            </a>
-          </div>
-        </div></main>
+            <div className="col-2">
+              <Link className="nav-link form-control mb-3" style={{ textAlign: 'center' }} to={`/EventAdmin/${additionalData}`}>
+                Previous
+              </Link>
+            </div>
+          </main>
+        </div>
+      </div>
+      <Dialog
+        open={open}
+        TransitionComponent={Transition}
+        keepMounted
+        fullWidth
+        maxWidth="sm"
+        className=""
+        onClose={handleClose}
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <form onSubmit={formik.handleSubmit}>
+          <DialogTitle id="" >
+            Create Shop
+          </DialogTitle>
+          <DialogContent dividers >
+            <div className='max-w-5xl my-2 mx-auto'>
+              <TextField id="outlined-basic" error={formik.touched.username && formik.errors.username ? true : undefined} value={formik.values.username}
+                className='w-full' name="username" onChange={formik.handleChange} onBlur={formik.handleBlur} label="Username" variant="outlined" />
+              {formik.errors.username && formik.touched.username && <div className='text mt-1 text-red-600 font-semibold'>{formik.errors.username}</div>}
+            </div>
+            <div className='max-w-5xl my-2 mx-auto'>
+              <TextField type='password' id="outlined-basic" error={formik.touched.password && formik.errors.password ? true : undefined} value={formik.values.password}
+                className='w-full' name="password" onChange={formik.handleChange} onBlur={formik.handleBlur} label="Password" variant="outlined" />
+              {formik.errors.password && formik.touched.password && <div className='text mt-1 text-red-600 font-semibold'>{formik.errors.password}</div>}
+            </div>
+            <div className='max-w-5xl my-2 mx-auto'>
+              {/* {error && <div className='text mt-1 text-center text-xl text-red-600 my-3 font-semibold'>{error}</div>} */}
+              <TextField id="outlined-basic" error={formik.touched.name && formik.errors.name ? true : undefined}
+                className='w-full' value={formik.values.name} name="name" onChange={formik.handleChange} onBlur={formik.handleBlur} label="Name" variant="outlined" />
+              {formik.errors.name && formik.touched.name && <div className='text mt-1 text-red-600 font-semibold'>{formik.errors.name}</div>}
+            </div>
+            <div className='max-w-5xl my-2 mx-auto'>
+              <TextField id="outlined-basic" error={formik.touched.role && formik.errors.role ? true : undefined}
+                className='w-full' name="role" onChange={formik.handleChange} onBlur={formik.handleBlur} label="role" variant="outlined"
+                value={formik.values.role} />
+              {formik.errors.role && formik.touched.role && <div className='text mt-1 text-red-600 font-semibold'>{formik.errors.role}</div>}
+            </div>
+          </DialogContent>
+          <DialogActions>
+            <Button type='submit' >
+              Save
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
     </div>
-  </div>
-</div>
+  );
+}
+
+export default ShopAdmin;
+
+
