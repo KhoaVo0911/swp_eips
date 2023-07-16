@@ -75,8 +75,6 @@ function Product() {
   const [comboList, setComboList] = useState([]);
   const [selectedDateStart, setSelectedDateStart] = useState(null);
   const [selectedDateEnd, setSelectedDateEnd] = useState(null);
-
-
   const dispatch = useDispatch();
   const userString = localStorage.getItem("user");
   const userObject = JSON.parse(userString);
@@ -92,7 +90,7 @@ function Product() {
     setSelectedDateEnd(day);
   };
   useEffect(() => {
-    if (shopByUsername.shopId) {
+    if (shopByUsername.id) {
       let body = { shopId: shopByUsername.id, beginDate: selectedDateStart, endDate: selectedDateEnd }
       dispatch(PostRevenueAsyncApi(body))
     }
