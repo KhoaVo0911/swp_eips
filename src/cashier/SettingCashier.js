@@ -7,11 +7,19 @@ import SearchIcon from '@mui/icons-material/Search';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
 import { PostSearchCardAsyncApi, PutCardAsyncApi, PutDepositAsyncApi, PutWithdrawAsyncApi } from '../services/card/cardSlice';
-import { Tooltip } from '@mui/material';
+import { Button, Tooltip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import LocalAtmIcon from '@mui/icons-material/LocalAtm';
 import SouthIcon from '@mui/icons-material/South';
 import DoneIcon from '@mui/icons-material/Done';
+import PublicIcon from '@mui/icons-material/Public';
+import PublicOffIcon from '@mui/icons-material/PublicOff';
+import ClearIcon from '@mui/icons-material/Clear';
+import DialogTitle from '@mui/material/DialogTitle';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
 
 function parseToVND(number) {
   let strNumber = number.toString().replace(/[.,]/g, "");
@@ -33,6 +41,18 @@ export default function SettingCashier() {
   const [isUpdate, setIsUpdate] = useState(false);
   const dispatch = useDispatch();
   const { SearchCardList } = useSelector((state) => state.card);
+  const [openUpdate, setOpenUpdate] = React.useState(false);
+
+
+  const handleClickOpenUpdate = (data) => {
+    setOpenUpdate(true);
+  };
+
+  const handleCloseUpdate = () => {
+    setOpenUpdate(false);
+    setDeposit(0)
+    setMoney(0)
+  };
   const handleChangeSearch = (item) => {
     setSearch(item)
     dispatch(PostSearchCardAsyncApi({ id: item })).then((response) => {
@@ -59,9 +79,24 @@ export default function SettingCashier() {
     setPassword('');
   };
   const handleOpenUpdateCardChange = () => {
-    setIsUpdate(true)
-    setDeposit(0)
-    setMoney('')
+    if (SearchCardList.status == true) {
+      setIsUpdate(true)
+      setDeposit(0)
+      setMoney('')
+    } else {
+
+    }
+  };
+  const handleClearUpdate = () => {
+    dispatch(PostSearchCardAsyncApi({ id: search })).then((response) => {
+      if (response.payload != undefined) {
+        setUsername(response.payload.username)
+        setPhone(response.payload.phoneNumber)
+        setBalance(response.payload.balance)
+      }
+    }).catch((error) => {
+    });
+    setIsUpdate(false)
   };
   const handleUpdateCardChange = () => {
     dispatch(PutCardAsyncApi({
@@ -80,6 +115,7 @@ export default function SettingCashier() {
     })).then((response) => {
       setMoney('')
       setDeposit(0)
+      setOpenUpdate(false)
       if (response.payload != undefined) {
         dispatch(PostSearchCardAsyncApi({ id: search })).then((response) => {
           if (response.payload != undefined) {
@@ -101,6 +137,7 @@ export default function SettingCashier() {
     })).then((response) => {
       setMoney('')
       setDeposit(0)
+      setOpenUpdate(false)
       if (response.payload != undefined) {
         dispatch(PostSearchCardAsyncApi({ id: search })).then((response) => {
           if (response.payload != undefined) {
@@ -117,11 +154,13 @@ export default function SettingCashier() {
   const handleDepositOpen = () => {
     if (isUpdate == false) {
       setDeposit(1)
+      setOpenUpdate(false)
     }
   }
   const handleWithDrawOpen = () => {
     if (isUpdate == false) {
       setDeposit(2)
+      setOpenUpdate(false)
     }
   }
   return (
@@ -162,25 +201,34 @@ export default function SettingCashier() {
                   </thead>
                   <tbody>
                     <tr>
-                      <th className='pt-4 text-xl'>{SearchCardList.eventId}</th>
-                      <th className='pt-4 text-xl'>
+                      <th className='pt-4 text-xl w-10'>{SearchCardList.eventId}</th>
+                      <th className='pt-4 text-xl w-44'>
                         {isUpdate == false ? username
-                          : <input className="form-control" value={username}
-                            onChange={(e) => setUsername(e.target.value)} />}
+                          : <div className='w-44 items-center text-center justify-center mx-auto'>
+                            <input className="form-control w-32" value={username}
+                              onChange={(e) => setUsername(e.target.value)} />
+                          </div>}
                       </th>
-                      <th className='pt-4 text-xl'>
+                      <th className='pt-4 text-xl w-44'>
                         {isUpdate == false ? phone
-                          : <input className="form-control" value={phone}
-                            onChange={(e) => setPhone(e.target.value)} />}
+                          : <div className='w-44 items-center text-center justify-center mx-auto'>
+                            <input className="form-control w-32" value={phone}
+                              onChange={(e) => setPhone(e.target.value)} />
+                          </div>
+                        }
                       </th>
-                      <th className='pt-4 text-xl'>
+                      <th className='pt-4 text-xl w-44'>
                         {isUpdate == false ? parseToVND(balance)
-                          : <input className="form-control" value={balance}
-                            onChange={(e) => setBalance(e.target.value)} />}
+                          : <div className='w-44 items-center text-center justify-center mx-auto'>
+                            <input className="form-control w-32" value={balance}
+                              onChange={(e) => setBalance(e.target.value)} />
+                          </div>}
                       </th>
-                      <th className='pt-4 text-xl'>{SearchCardList.status == true ? "true" : SearchCardList.status == false ? "false" : null}</th>
+                      <th className='pt-4 text-xl w-44'>
+                        {SearchCardList.status == true ? <PublicIcon /> : SearchCardList.status == false ? <PublicOffIcon /> : null}
+                      </th>
 
-                      <th component="div" className='pt-4 text-xl'>
+                      <th component="div" className='pt-4 text-xl w-32'>
                         {SearchCardList.id &&
                           <div className='flex justify-center '>
                             <div></div>
@@ -190,13 +238,22 @@ export default function SettingCashier() {
                                   <IconButton  >
                                     <EditIcon className="" />
                                   </IconButton>
-                                </Tooltip> : <Tooltip onClick={handleUpdateCardChange} title="Done" className='h-10 w-10'>
-                                  <IconButton  >
-                                    <DoneIcon className="" />
-                                  </IconButton>
-                                </Tooltip>}
+                                </Tooltip> :
+                                <div className='flex gap-3'>
+                                  <Tooltip onClick={handleClearUpdate} title="Clear" className='h-10 w-10'>
+                                    <IconButton  >
+                                      <ClearIcon className="" />
+                                    </IconButton>
+                                  </Tooltip>
+                                  <Tooltip onClick={handleUpdateCardChange} title="Done" className='h-10 w-10'>
+                                    <IconButton  >
+                                      <DoneIcon className="" />
+                                    </IconButton>
+                                  </Tooltip>
+                                </div>
+                              }
                               {deposit == 1 ?
-                                <Tooltip onClick={handleDeposit} title="Done" className='h-10 w-10'>
+                                <Tooltip onClick={handleClickOpenUpdate} title="Done" className='h-10 w-10'>
                                   <IconButton  >
                                     <DoneIcon className="" />
                                   </IconButton>
@@ -206,7 +263,7 @@ export default function SettingCashier() {
                                   </IconButton>
                                 </Tooltip>}
                               {deposit == 2 ?
-                                <Tooltip onClick={handleWithdraw} title="Done" className='h-10 w-10'>
+                                <Tooltip onClick={handleClickOpenUpdate} title="Done" className='h-10 w-10'>
                                   <IconButton  >
                                     <DoneIcon className="" />
                                   </IconButton>
@@ -287,18 +344,39 @@ export default function SettingCashier() {
                   <input value={name} onChange={(e) => setName(e.target.value)} className="form-control mt-4" type="text" name="profile-name" id="profile-name" placeholder="New Name" />
 
                   <div className="d-flex mt-4">
-                    <button onClick={handleResetChange} className="form-control me-3">
+                    <Button variant='contained' color='inherit' onClick={handleResetChange} className="form-control me-3">
                       Reset
-                    </button>
-                    <button onClick={handleUpdateChange} className=" w-full rounded-md bg-blue-400">
+                    </Button>
+                    <Button variant='contained' color='primary' disabled={name == '' || password == '' ? true : false} onClick={handleUpdateChange} className=" w-full rounded-md bg-blue-400">
                       Update
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+        <Dialog
+          open={openUpdate}
+          onClose={handleCloseUpdate}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {"Notification"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Are you sure you want to update the status of your Account and Shop?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseUpdate}>Disagree</Button>
+            <Button onClick={deposit == 1 ? handleDeposit : deposit == 2 ? handleWithdraw : handleCloseUpdate} autoFocus>
+              Agree
+            </Button>
+          </DialogActions>
+        </Dialog>
       </main></div>
   )
 }

@@ -130,10 +130,9 @@ function ShopAdmin() {
     setOpen(false);
     formik.setValues(
       {
-        id: "",
+        username: "",
+        password: "",
         name: "",
-        description: "",
-        area: "",
       }
     );
     formik.setTouched({});
@@ -147,13 +146,11 @@ function ShopAdmin() {
       username: "",
       password: "",
       name: "",
-      role: "",
     },
     validationSchema: Yup.object({
       username: Yup.string().min(2, "Too Short!").max(4000, "Too Long!").required(),
       password: Yup.string().min(5, "Too Short!").max(4000, "Too Long!").required(),
       name: Yup.string().min(5, "Too Short!").max(4000, "Too Long!").required(),
-      role: Yup.string().required(),
     }), onSubmit: values => {
       let DataBody
 
@@ -161,7 +158,7 @@ function ShopAdmin() {
         username: values.username,
         password: values.password,
         name: values.name,
-        role: values.role,
+        role: "sale"
       }
       dispatch(PostAccountAsyncApi(DataBody)).then((response) => {
         setOpen(false);
@@ -170,7 +167,6 @@ function ShopAdmin() {
             username: "",
             password: "",
             name: "",
-            role: "",
           }
         );
         formik.setTouched({});
@@ -340,10 +336,9 @@ function ShopAdmin() {
               {formik.errors.name && formik.touched.name && <div className='text mt-1 text-red-600 font-semibold'>{formik.errors.name}</div>}
             </div>
             <div className='max-w-5xl my-2 mx-auto'>
-              <TextField id="outlined-basic" error={formik.touched.role && formik.errors.role ? true : undefined}
-                className='w-full' name="role" onChange={formik.handleChange} onBlur={formik.handleBlur} label="role" variant="outlined"
-                value={formik.values.role} />
-              {formik.errors.role && formik.touched.role && <div className='text mt-1 text-red-600 font-semibold'>{formik.errors.role}</div>}
+              <TextField id="outlined-basic"
+                className='w-full' disabled value="sale" label="role" variant="outlined"
+                 />
             </div>
           </DialogContent>
           <DialogActions>

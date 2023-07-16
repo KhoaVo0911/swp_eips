@@ -400,9 +400,8 @@ export default function Admin() {
               {eventList.length > 0 && filteredData.map((item, index) => {
                 console.log("na", item.status)
                 return (
-                  <div className="" key={index}>
-
-                    <Card sx={{ maxWidth: 345 }}>
+                  <div  key={index}>
+                    <Card sx={{ maxWidth: 345 }} className="my-2">
                       <CardMedia
                         sx={{ height: 300, width: 400 }}
                         image={item.img}

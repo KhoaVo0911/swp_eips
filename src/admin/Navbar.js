@@ -8,6 +8,9 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 
 export default function Navbar() {
+    const handleOut = () => {
+        localStorage.clear();
+    }
     const userString = localStorage.getItem("user");
     const userObject = JSON.parse(userString);
     return (
@@ -71,6 +74,7 @@ export default function Navbar() {
                         }
                         to="/"
                         className="text-black"
+                        onClick={handleOut}
                     >
                         <div className='flex'>
                             <LogoutIcon className="mr-2" />

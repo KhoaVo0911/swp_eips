@@ -34,6 +34,7 @@ import {
 import "./Slider.css"
 import { accountAction } from '../services/account/accountSlice';
 import { ProductAction } from '../services/product/productSlice';
+import DialogContentText from '@mui/material/DialogContentText';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -60,6 +61,19 @@ function EventAdmin() {
   const { eventListImg } = useSelector((state) => state.event)
   const { shopList } = useSelector((state) => state.shop)
   const { CardList } = useSelector((state) => state.card)
+  const [openUpdate, setOpenUpdate] = React.useState(false);
+  const [update50Card, setUpdate50Card] = React.useState(0);
+
+
+  const handleClickOpenUpdate = (data) => {
+    setOpenUpdate(true);
+    setUpdate50Card(data)
+  };
+
+  const handleCloseUpdate = () => {
+    setOpenUpdate(false);
+    setUpdate50Card(0)
+  };
 
   const settings = {
     dots: true, // Hiển thị chấm chỉ mục
@@ -111,6 +125,8 @@ function EventAdmin() {
     setFilteredData(filteredResults);
   }
   const hanleClickCard = () => {
+    setOpenUpdate(false)
+    setUpdate50Card(0)
     dispatch(PostCardAsyncApi({ eventId: param.id })).then((response) => {
       if (response.payload != undefined) {
         dispatch(getCardAsyncApi(param.id))
@@ -120,6 +136,8 @@ function EventAdmin() {
     });
   };
   const hanleClick50Card = () => {
+    setOpenUpdate(false)
+    setUpdate50Card(0)
     dispatch(PostCard50AsyncApi({ eventId: param.id })).then((response) => {
       if (response.payload != undefined) {
         dispatch(getCardAsyncApi(param.id))
@@ -269,7 +287,7 @@ function EventAdmin() {
                 </div>
                 <div className='mb-10'>
                   <Slider {...settings}>
-                    {eventListImg.map((item, index) => {
+                    {eventListImg && eventListImg.map((item, index) => {
                       return (
                         <img src={item.img} className='h-52 w-32 p-1' />
                       )
@@ -285,19 +303,19 @@ function EventAdmin() {
                     Search
                   </button>
                 </form>
-                
+
                 <div>
                   <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={handleClickOpen}>
                     Create Shop
                   </button>
                 </div>
                 <div>
-                  <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={hanleClickCard}>
+                  <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={() => handleClickOpenUpdate(1)}>
                     Create Card
                   </button>
                 </div>
                 <div>
-                  <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={hanleClick50Card}>
+                  <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={() => handleClickOpenUpdate(2)}>
                     Create 50 Cards
                   </button>
                 </div>
@@ -464,6 +482,27 @@ function EventAdmin() {
             </Button>
           </DialogActions>
         </form>
+      </Dialog>
+      <Dialog
+        open={openUpdate}
+        onClose={handleCloseUpdate}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Notification"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to update the status of your Account and Shop?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseUpdate}>Disagree</Button>
+          <Button onClick={update50Card == 1 ? hanleClickCard : update50Card == 2 ? hanleClick50Card : handleCloseUpdate} autoFocus>
+            Agree
+          </Button>
+        </DialogActions>
       </Dialog>
       {/* <Dialog
         open={openCard}

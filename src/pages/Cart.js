@@ -69,6 +69,12 @@ export default function Cart() {
           ];
         dispatch(PostOrderAsyncApi(newDataBody)).then((response) => {
             if (response.payload != undefined) {
+                dispatch(cartAction.clearToCart())
+                dispatch(PostSearchCardAsyncApi({ id: search })).then((response) => {
+                    if (response.payload != undefined) {
+                    }
+                }).catch((error) => {
+                });
             }
         }).catch((error) => {
         });

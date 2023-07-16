@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Navbar from './Navbar'
 import { useDispatch } from 'react-redux';
 import { PutAccountAsyncApi } from '../services/account/accountSlice';
+import { Button } from '@mui/material';
 
 
 export default function SettingAdmin() {
@@ -80,12 +81,12 @@ export default function SettingAdmin() {
                   <input value={name} onChange={(e) => setName(e.target.value)} className="form-control mt-4" type="text"  name="profile-name" id="profile-name" placeholder="New Name" />
 
                   <div className="d-flex mt-4">
-                    <button onClick={handleResetChange} className="form-control me-3">
+                    <Button variant='contained' color='inherit' onClick={handleResetChange} className="form-control me-3">
                       Reset
-                    </button>
-                    <button onClick={handleUpdateChange} className=" w-full rounded-md bg-blue-400">
+                    </Button>
+                    <Button variant='contained' color='primary'  disabled={name == '' || password == '' ? true : false} onClick={handleUpdateChange} className=" w-full rounded-md bg-blue-400">
                       Update
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>

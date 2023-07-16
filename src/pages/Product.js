@@ -5,7 +5,7 @@ import "../css/bootstrap.min.css";
 import "../css/bootstrap-icons.css";
 import axios from "axios";
 import Navbar from "../product/Navbar";
-import { PostComboProductAsyncApi, PostProductAsyncApi, ProductAction, PutProductAsyncApi, getAllProductAsyncApi, getProductAsyncApi, getProductSoldAsyncApi } from "../services/product/productSlice";
+import { PostComboProductAsyncApi, PostProductAsyncApi, PostRevenueAsyncApi, ProductAction, PutProductAsyncApi, getAllProductAsyncApi, getProductAsyncApi, getProductSoldAsyncApi } from "../services/product/productSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { ShopAction, getShopByUsernameAsyncApi } from "../services/shop/shopSlice";
 import PublicIcon from '@mui/icons-material/Public';
@@ -36,8 +36,10 @@ import AddIcon from '@mui/icons-material/Add';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import Stack from '@mui/material/Stack';
-
-
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
 import * as Yup from "yup";
 import { CycloneOutlined } from "@mui/icons-material";
 import { accountAction } from "../services/account/accountSlice";
@@ -71,13 +73,31 @@ function Product() {
   const [priceCombo, setPriceCombo] = useState("");
   const [descriptionCombo, setDescriptionCombo] = useState("");
   const [comboList, setComboList] = useState([]);
+  const [selectedDateStart, setSelectedDateStart] = useState(null);
+  const [selectedDateEnd, setSelectedDateEnd] = useState(null);
+
+
   const dispatch = useDispatch();
   const userString = localStorage.getItem("user");
   const userObject = JSON.parse(userString);
   const dataCategory = ["Food", "Drink", "Combo", "Other"]
-  const { ProductListAll, ProductSold } = useSelector((state) => state.product)
+  const { ProductListAll, ProductSold, Revenue } = useSelector((state) => state.product)
   const { shopByUsername } = useSelector((state) => state.shop)
-
+  const handleDateStartChange = (date) => {
+    const day = dayjs(date).format('YYYY-MM-DD');
+    setSelectedDateStart(day);
+  };
+  const handleDateEndChange = (date) => {
+    const day = dayjs(date).format('YYYY-MM-DD');
+    setSelectedDateEnd(day);
+  };
+  useEffect(() => {
+    if (shopByUsername.shopId) {
+      let body = { shopId: shopByUsername.id, beginDate: selectedDateStart, endDate: selectedDateEnd }
+      dispatch(PostRevenueAsyncApi(body))
+    }
+    console.log("ngu123", selectedDateEnd, selectedDateStart)
+  }, [selectedDateEnd, selectedDateStart]);
   useEffect(() => {
     dispatch(getShopByUsernameAsyncApi(userObject.username)).then((response) => {
       if (response.payload != undefined) {
@@ -118,6 +138,8 @@ function Product() {
   }
   const handleClickOpen = (data) => {
     setOpen(true);
+    setOpenCombo(false)
+    setSelectedImage()
     if (data.id) {
       setIsUpdate(true)
       setProductId(data.id)
@@ -220,6 +242,25 @@ function Product() {
 
 
   };
+  const handleIncrease = (data) => {
+    const newArrayList = [...comboList];
+    const exist = newArrayList.find(item => item.id === data.id)
+    const objIndex = newArrayList.findIndex((obj => obj.id == data.id));
+    if (exist) newArrayList[objIndex].quantity = exist.quantity + 1;
+    setComboList(newArrayList)
+  }
+
+  const handleDecrease = (data) => {
+    const newArrayList = [...comboList];
+    const exist = newArrayList.find(item => item.id === data.id)
+    const objIndex = newArrayList.findIndex((obj => obj.id == data.id));
+    if (exist) {
+      newArrayList[objIndex].quantity > 1
+        ? newArrayList[objIndex].quantity = exist.quantity - 1
+        : newArrayList.splice(objIndex, 1)
+    }
+    setComboList(newArrayList)
+  }
   const handleClickAddCombo = (data) => {
     const comboIndex = comboList.findIndex((item) => item.name === data.name);
     if (comboIndex !== -1) {
@@ -275,7 +316,81 @@ function Product() {
       const userObject = JSON.parse(userString);
       const username = userObject.username;
       console.log("ngu1", username)
-      if (click == false) { setImg(selectedImage) }
+      if (click == false) {
+        setImg(selectedImage)
+        DataBody = {
+          shopId: shopByUsername.id,
+          name: values.name,
+          price: values.price,
+          img: selectedImage,
+          description: values.description,
+          category: values.category,
+        }
+        DataBodyUpdate = {
+          id: productId,
+          name: values.name,
+          price: values.price,
+          img: selectedImage,
+          description: values.description,
+          status: values.status,
+        }
+        if (isUpdate == false) {
+          dispatch(PostProductAsyncApi(DataBody)).then((response) => {
+            setImg('')
+            SetClick(false)
+            setSelectedImage()
+            setOpen(false);
+            formik.setValues(
+              {
+                category: "",
+                description: "",
+                name: "",
+                price: "",
+                status: true
+              }
+            );
+            formik.setTouched({});
+            formik.setErrors({});
+            if (response.payload != undefined) {
+              dispatch(getAllProductAsyncApi({ shopId: shopByUsername.id })).then((response) => {
+                if (response.payload != undefined) {
+                  setFilteredData(response.payload)
+                }
+              }).catch((error) => {
+              });
+            }
+          }).catch((error) => {
+            // Handle failure case
+          });
+        } else {
+          dispatch(PutProductAsyncApi(DataBodyUpdate)).then((response) => {
+            setImg('')
+            SetClick(false)
+            setSelectedImage()
+            setOpen(false);
+            formik.setValues(
+              {
+                category: "",
+                description: "",
+                name: "",
+                price: "",
+              }
+            );
+            formik.setTouched({});
+            formik.setErrors({});
+            if (response.payload != undefined) {
+              dispatch(getAllProductAsyncApi({ shopId: shopByUsername.id })).then((response) => {
+                if (response.payload != undefined) {
+                  setFilteredData(response.payload)
+                }
+              }).catch((error) => {
+              });
+            }
+          }).catch((error) => {
+            // Handle failure case
+          });
+        }
+      }
       else {
         const storageRef = ref(storage, `Package/${selectedImage.name}`);
         const uploadTask = uploadBytesResumable(storageRef, selectedImage);
@@ -489,7 +604,27 @@ function Product() {
               {openCombo == false ?
                 <div className="col-lg-6 col-6" style={{ paddingTop: "145px" }}>
                   <div className="custom-block bg-white">
-                    <h5 className="mb-4">REVENUS</h5>
+                    <div className='flex gap-5'>
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                          label="Start Date"
+                          size="small"
+                          value={selectedDateStart}
+                          onChange={handleDateStartChange}
+                        />
+                      </LocalizationProvider>
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                          label="End Date"
+                          value={selectedDateEnd}
+                          onChange={handleDateEndChange}
+                        />
+                      </LocalizationProvider>
+                    </div>
+                    <div className="mb-2 float-right">
+                      <p className='text-xl uppercase font-bold mt-[10px]'>Total Revenue: {parseToVND(Revenue) + " VNĐ"}</p>
+                    </div>
+                    <h5 className="mb-4 uppercase clear-right">Product Sold</h5>
                     <form >
                       <table
                         className="account-table table"
@@ -506,14 +641,14 @@ function Product() {
                         </thead>
                         <tbody>
 
-                          {ProductSold.map((item, index) => {
+                          {ProductSold && ProductSold.map((item, index) => {
                             return (
                               <tr index={index} style={{ textAlign: "center" }}>
                                 <td scope="row" className="mx-2 px-2">
                                   {item.name}
                                 </td>
                                 <td scope="row" className="mx-2 px-2">
-                                  {item.img}
+                                  <img src={item.img} className="h-32 w-32" />
                                 </td>
                                 <td scope="row" className="mx-2 px-2">
                                   {item.description}
@@ -565,8 +700,9 @@ function Product() {
                               <Button
                                 variant="contained"
                                 component="label"
+                                className="h-[38px]"
                               >
-                                Upload Image
+                                Image
                                 <input
                                   type="file"
                                   hidden
@@ -574,6 +710,7 @@ function Product() {
                                     setSelectedImage(event.target.files[0]);
                                     SetClick(true);
                                   }}
+
                                 />
                               </Button>
 
@@ -630,14 +767,25 @@ function Product() {
                                 <th>{index + 1}</th>
                                 <th>{item.id}</th>
                                 <th>{item.name}</th>
-                                <th>{item.quantity}</th>
+                                <th className="flex justify-center ">
+                                  <div className="mt-[6px] cursor-pointer" onClick={() => handleDecrease(item)}>
+                                    <svg className="fill-current text-gray-600 w-3" viewBox="0 0 448 512"><path d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" />
+                                    </svg>
+                                  </div>
+                                  <p className="mx-3 text-black "   >{item.quantity} </p>
+                                  <div className="mt-[6px] cursor-pointer" onClick={() => handleIncrease(item)} >
+                                    <svg className="fill-current text-gray-600 w-3" viewBox="0 0 448 512">
+                                      <path d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" />
+                                    </svg>
+                                  </div>
+                                </th>
                               </tr>
                             )
                           })}
                         </tbody>
                       </table>
                       <div className="float-right">
-                        <Button onClick={handleClickSubmitCombo} color="primary" variant="contained" >
+                        <Button disabled={comboList.length > 0 ? false : true} onClick={handleClickSubmitCombo} color="primary" variant="contained" >
                           Submit
                         </Button>
                       </div>

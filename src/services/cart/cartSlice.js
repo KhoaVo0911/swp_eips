@@ -14,8 +14,11 @@ const cartReducer = createSlice({
     initialState,
     //thêm dữ liệu content vào reducer
     reducers: {
+        clearToCart: (state, action) => {
+            state.arrCart = []
+        },
         addTocart: (state, action) => {
-            
+
             const exist = state.arrCart.find(item => item.id === action.payload.id)
             const objIndex = state.arrCart.findIndex((obj => obj.id == action.payload.id));
 

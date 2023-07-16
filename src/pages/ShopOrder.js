@@ -10,6 +10,12 @@ import { EventAction, getEventImgListAsyncApi } from "../services/event/eventSli
 import { accountAction } from "../services/account/accountSlice";
 import { CardAction } from "../services/card/cardSlice";
 
+function parseToVND(number) {
+  let strNumber = number.toString().replace(/[.,]/g, "");
+  strNumber = strNumber.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return strNumber;
+}
+
 export default function ShopOrder() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
@@ -68,14 +74,9 @@ export default function ShopOrder() {
 
 
   const handleChange = (e, data, index) => {
-
-    if (e.target.value > 10) {
-    } else {
-      const newArrayList = [...filteredData];
-      newArrayList[index].quantity = e.target.value;
-      setFilteredData(newArrayList);
-    }
-
+    const newArrayList = [...filteredData];
+    newArrayList[index].quantity = e.target.value;
+    setFilteredData(newArrayList);
   };
   console.log("adx", filteredData)
   return (
@@ -102,7 +103,7 @@ export default function ShopOrder() {
                   </h3>
                   <p className="mt-1 text-sm text-gray-500">{product.category}</p>
                 </div>
-                <p className="text-sm font-medium text-gray-900">{product.price}</p>
+                <p className="text-sm font-medium text-gray-900">{parseToVND(product.price) + " Vnđ"}</p>
               </div>
               <div className="mt-2 flex relative z-10 justify-between">
                 <div onClick={() => handleClickAddToCart(index)} className="cursor-pointer">

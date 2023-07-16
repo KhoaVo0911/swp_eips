@@ -10,6 +10,9 @@ import CategoryIcon from '@mui/icons-material/Category';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 
 export default function Navbar() {
+    const handleOut = () => {
+        localStorage.clear();
+    }
     const userString = localStorage.getItem("user");
     const userObject = JSON.parse(userString);
     return (
@@ -85,6 +88,7 @@ export default function Navbar() {
                             isActive ? { color: "#60a5fa" } : undefined
                         }
                         to="/"
+                        onClick={handleOut}
                         className="text-black"
                     >
                         <div className='flex'>

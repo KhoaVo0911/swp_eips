@@ -42,7 +42,7 @@ const authSlice = createSlice({
             })
             .addCase(getProductSoldAsyncApi.fulfilled, (state, action) => {
                 console.log("3", state, action.payload)
-                state.ProductOfSale = action.payload;
+                state.ProductSold = action.payload;
             })
             .addCase(getProductSoldAsyncApi.rejected, (state, action) => {
             });
@@ -51,7 +51,7 @@ const authSlice = createSlice({
             })
             .addCase(GetListProductOfSaleAsyncApi.fulfilled, (state, action) => {
                 console.log("3", state, action.payload)
-                state.ProductSold = action.payload;
+                state.ProductOfSale = action.payload;
             })
             .addCase(GetListProductOfSaleAsyncApi.rejected, (state, action) => {
             });

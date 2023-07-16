@@ -6,6 +6,7 @@ import { ShopAction, getShopByUsernameAsyncApi } from '../services/shop/shopSlic
 import { EventAction, getEventByShopAsyncApi } from '../services/event/eventSlice';
 import { CardAction } from '../services/card/cardSlice';
 import { ProductAction } from '../services/product/productSlice';
+import { Button } from '@mui/material';
 function parseTimestamp(timestamp) {
   const date = new Date(timestamp);
   const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
@@ -158,17 +159,17 @@ export default function Settings() {
               <div className="tab-content" id="myTabContent">
                 <div className="tab-pane fade show active" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabIndex={0}>
                   <h6 className="mb-4">User Profile</h6>
-                  <input className="form-control mt-4"  name="profile-email" id="profile-email" disabled placeholder={userObject.username} />
+                  <input className="form-control mt-4" name="profile-email" id="profile-email" disabled placeholder={userObject.username} />
                   <input value={password} onChange={(e) => setPassword(e.target.value)} className="form-control mt-4" type="password" name="profile-email" id="profile-email" placeholder="New Password" />
                   <input value={name} onChange={(e) => setName(e.target.value)} className="form-control mt-4" type="text" name="profile-name" id="profile-name" placeholder="New Name" />
 
                   <div className="d-flex mt-4">
-                    <button onClick={handleResetChange} className="form-control me-3">
+                    <Button variant='contained' color='inherit' onClick={handleResetChange} className="form-control me-3">
                       Reset
-                    </button>
-                    <button onClick={handleUpdateChange} className=" w-full rounded-md bg-blue-400">
+                    </Button>
+                    <Button variant='contained' color='primary' disabled={name == '' || password == '' ? true : false} onClick={handleUpdateChange} className=" w-full rounded-md bg-blue-400">
                       Update
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
