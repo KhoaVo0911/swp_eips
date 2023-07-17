@@ -382,14 +382,26 @@ function EventAdmin() {
                   </button>
                 </form>
                 <div className='max-w-5xl my-5 mx-auto'>
-                  {selectedImage == undefined ? null : <img alt="" className='mx-auto h-48 w-48 my-2' src={click == false ? selectedImage : window.URL.createObjectURL(selectedImage)} />}
-                  {selectedImage == undefined ? null : <Button
-                    variant="contained"
-                    component="label"
-                    onClick={HandleUploadImgEvent}
-                  >
-                    Update
-                  </Button>}
+                  {isImg && selectedImage !== undefined && (
+                    <>
+                      <img
+                        alt=""
+                        className="mx-auto h-48 w-48 my-2"
+                        src={
+                          click === false
+                            ? selectedImage
+                            : window.URL.createObjectURL(selectedImage)
+                        }
+                      />
+                      <Button
+                        variant="contained"
+                        component="label"
+                        onClick={HandleUploadImgEvent}
+                      >
+                        Update
+                      </Button>
+                    </>
+                  )}
 
                 </div>
                 <div>
