@@ -66,7 +66,7 @@ export default function Cart() {
         const newDataBody = [
             body[0],
             ...body[1].flat()
-          ];
+        ];
         dispatch(PostOrderAsyncApi(newDataBody)).then((response) => {
             if (response.payload != undefined) {
                 dispatch(cartAction.clearToCart())
@@ -260,7 +260,7 @@ export default function Cart() {
                                 <span>Total cost</span>
                                 <span>{parseToVND(total)} Vnđ</span>
                             </div>
-                            <button onClick={handleCheckout} className="bg-indigo-500 font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase w-full">Checkout</button>
+                            <button disabled={SearchCardList.balance < total ? true : false} onClick={handleCheckout} className="bg-indigo-500 font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase w-full">Checkout</button>
                         </div>
                     </div>
 

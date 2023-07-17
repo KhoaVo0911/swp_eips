@@ -24,7 +24,7 @@ export default function ShopOrder() {
   const dispatch = useDispatch();
   const { ProductOfSale } = useSelector((state) => state.product)
   const { arrCart } = useSelector((state) => state.cart)
-  const handleClickAddToCart = (index) => {
+  const handleClickAddToCart = (index) => {   
     dispatch(cartAction.addTocart(
       {
         quantity: parseInt(filteredData[index].quantity),
@@ -35,6 +35,7 @@ export default function ShopOrder() {
         image: filteredData[index].img,
       }
     ))
+     
   };
 
   console.log("cart", arrCart)
@@ -86,11 +87,11 @@ export default function ShopOrder() {
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
         <h3 className=" font-bold  mb-0">PRODUCT</h3>
         <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 ">
-          {filteredData.map((product, index) => (
+          {filteredData && filteredData.map((product, index) => (
             <div key={index} className="  border-2 p-2 ">
               <div className=" w-full overflow-hidden rounded-md bg-gray-200  group-hover:opacity-75 lg:h-80">
                 <img
-                  src={product.imageSrc}
+                  src={product.img}
                   alt={product.imageAlt}
                   className="h-full w-full object-cover object-center lg:h-full lg:w-full"
                 />

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { useNavigate } from "react-router-dom";
-import GetEventApi, { GetEventByShopApi, GetEventImgListApi, PostEventApi, PutEventApi } from "../../api/EventApi";
+import GetEventApi, { GetEventByShopApi, GetEventImgListApi, PostEventApi, PostImgEventApi, PutEventApi } from "../../api/EventApi";
 
 const getUserfromLocalStorage = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
 const initialState = {
@@ -48,6 +48,14 @@ const authSlice = createSlice({
                 console.log("3", state, action.payload)
             })
             .addCase(PostEventAsyncApi.rejected, (state, action) => {
+            });
+            builder
+            .addCase(PostImgEventAsyncApi.pending, (state) => {
+            })
+            .addCase(PostImgEventAsyncApi.fulfilled, (state, action) => {
+                console.log("3", state, action.payload)
+            })
+            .addCase(PostImgEventAsyncApi.rejected, (state, action) => {
             });
         builder
             .addCase(PutEventAsyncApi.pending, (state) => {
@@ -116,6 +124,19 @@ export const PostEventAsyncApi = createAsyncThunk(
     async (body) => {
         try {
             const response = await PostEventApi(body);
+            return response;
+        } catch (error) {
+            const json = error.response.data;
+            const errors = json[""].errors;
+            throw errors[0].errorMessage;
+        }
+    }
+);
+export const PostImgEventAsyncApi = createAsyncThunk(
+    'eventReducer/postImgAsyncApi',
+    async (body) => {
+        try {
+            const response = await PostImgEventApi(body);
             return response;
         } catch (error) {
             const json = error.response.data;

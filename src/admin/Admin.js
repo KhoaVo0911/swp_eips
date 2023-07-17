@@ -26,6 +26,7 @@ import { CardAction } from '../services/card/cardSlice';
 import { ProductAction } from '../services/product/productSlice';
 import { ShopAction } from '../services/shop/shopSlice';
 
+
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -52,6 +53,7 @@ export default function Admin() {
   const [selectedValue, setSelectedValue] = React.useState([]);
   const [selectedDateBegin, setSelectedDateBegin] = useState(null);
   const [selectedDateEnd, setSelectedDateEnd] = useState(null);
+  const [err, setErr] = useState();
   const handleDateBeginChange = (event) => {
     const date = event.target.value;
     console.log("ga3", date)
@@ -81,6 +83,7 @@ export default function Admin() {
   }, []);
   const handleClickOpen = (data) => {
     setOpen(true);
+
     if (data.id) {
       setIdEvent(data.id)
       setIsUpdate(true)
@@ -107,6 +110,7 @@ export default function Admin() {
     setOpen(false);
     setImg('')
     SetClick(false)
+    setIsUpdate(false)
     setSelectedImage()
     setSelectedDateBegin(null)
     setSelectedDateEnd(null)
@@ -188,26 +192,31 @@ export default function Admin() {
         }
         if (isUpdate == false) {
           dispatch(PostEventAsyncApi(DataBody)).then((response) => {
-            setImg('')
-            SetClick(false)
-            setSelectedImage()
-            setSelectedDateBegin(null)
-            setSelectedDateEnd(null)
-            setOpen(false);
-            formik.setValues(
-              {
-                name: "",
-                description: "",
-                beginDate: "",
-                endDate: "",
-                area: "",
-                img: "",
-                username: ""
-              }
-            );
-            formik.setTouched({});
-            formik.setErrors({});
-            if (response.payload != undefined) {
+            console.log("dataane", response.payload, response.payload.mess)
+            if (response.payload.mess == "Date not vaild") {
+              setErr(response.payload.mess)
+            }
+            else if (response.payload != undefined) {
+              setErr()
+              setImg('')
+              SetClick(false)
+              setSelectedImage()
+              setSelectedDateBegin(null)
+              setSelectedDateEnd(null)
+              setOpen(false);
+              formik.setValues(
+                {
+                  name: "",
+                  description: "",
+                  beginDate: "",
+                  endDate: "",
+                  area: "",
+                  img: "",
+                  username: ""
+                }
+              );
+              formik.setTouched({});
+              formik.setErrors({});
               dispatch(getEventAsyncApi()).then((response) => {
                 if (response.payload != undefined) {
                   setFilteredData(response.payload)
@@ -221,26 +230,31 @@ export default function Admin() {
           });
         } else {
           dispatch(PutEventAsyncApi(DataBodyUpdate)).then((response) => {
-            setImg('')
-            SetClick(false)
-            setSelectedImage()
-            setSelectedDateBegin(null)
-            setSelectedDateEnd(null)
-            setOpen(false);
-            formik.setValues(
-              {
-                name: "",
-                description: "",
-                beginDate: "",
-                endDate: "",
-                area: "",
-                img: "",
-                username: ""
-              }
-            );
-            formik.setTouched({});
-            formik.setErrors({});
-            if (response.payload != undefined) {
+            console.log("dataane", response.payload, response.payload.mess)
+            if (response.payload.mess == "Date not vaild") {
+              setErr(response.payload.mess)
+            }
+            else if (response.payload != undefined) {
+              setErr()
+              setImg('')
+              SetClick(false)
+              setSelectedImage()
+              setSelectedDateBegin(null)
+              setSelectedDateEnd(null)
+              setOpen(false);
+              formik.setValues(
+                {
+                  name: "",
+                  description: "",
+                  beginDate: "",
+                  endDate: "",
+                  area: "",
+                  img: "",
+                  username: ""
+                }
+              );
+              formik.setTouched({});
+              formik.setErrors({});
               dispatch(getEventAsyncApi()).then((response) => {
                 if (response.payload != undefined) {
                   setFilteredData(response.payload)
@@ -290,26 +304,31 @@ export default function Admin() {
               }
               if (isUpdate == false) {
                 dispatch(PostEventAsyncApi(DataBody)).then((response) => {
-                  setImg('')
-                  SetClick(false)
-                  setSelectedImage()
-                  setSelectedDateBegin(null)
-                  setSelectedDateEnd(null)
-                  setOpen(false);
-                  formik.setValues(
-                    {
-                      name: "",
-                      description: "",
-                      beginDate: "",
-                      endDate: "",
-                      area: "",
-                      img: "",
-                      username: ""
-                    }
-                  );
-                  formik.setTouched({});
-                  formik.setErrors({});
-                  if (response.payload != undefined) {
+                  console.log("dataane", response.payload, response.payload.mess)
+                  if (response.payload.mess == "Date not vaild") {
+                    setErr(response.payload.mess)
+                  }
+                  else if (response.payload != undefined) {
+                    setErr()
+                    setImg('')
+                    SetClick(false)
+                    setSelectedImage()
+                    setSelectedDateBegin(null)
+                    setSelectedDateEnd(null)
+                    setOpen(false);
+                    formik.setValues(
+                      {
+                        name: "",
+                        description: "",
+                        beginDate: "",
+                        endDate: "",
+                        area: "",
+                        img: "",
+                        username: ""
+                      }
+                    );
+                    formik.setTouched({});
+                    formik.setErrors({});
                     dispatch(getEventAsyncApi()).then((response) => {
                       if (response.payload != undefined) {
                         setFilteredData(response.payload)
@@ -323,26 +342,31 @@ export default function Admin() {
                 });
               } else {
                 dispatch(PutEventAsyncApi(DataBodyUpdate)).then((response) => {
-                  setImg('')
-                  SetClick(false)
-                  setSelectedImage()
-                  setSelectedDateBegin(null)
-                  setSelectedDateEnd(null)
-                  setOpen(false);
-                  formik.setValues(
-                    {
-                      name: "",
-                      description: "",
-                      beginDate: "",
-                      endDate: "",
-                      area: "",
-                      img: "",
-                      username: ""
-                    }
-                  );
-                  formik.setTouched({});
-                  formik.setErrors({});
-                  if (response.payload != undefined) {
+                  console.log("dataane", response.payload, response.payload.mess)
+                  if (response.payload.mess == "Date not vaild") {
+                    setErr(response.payload.mess)
+                  }
+                  else if (response.payload != undefined) {
+                    setErr()
+                    setImg('')
+                    SetClick(false)
+                    setSelectedImage()
+                    setSelectedDateBegin(null)
+                    setSelectedDateEnd(null)
+                    setOpen(false);
+                    formik.setValues(
+                      {
+                        name: "",
+                        description: "",
+                        beginDate: "",
+                        endDate: "",
+                        area: "",
+                        img: "",
+                        username: ""
+                      }
+                    );
+                    formik.setTouched({});
+                    formik.setErrors({});
                     dispatch(getEventAsyncApi()).then((response) => {
                       if (response.payload != undefined) {
                         setFilteredData(response.payload)
@@ -398,9 +422,8 @@ export default function Admin() {
             <h5 className="mb-4" style={{ textAlign: 'center' }}>Event List</h5>
             <section className=" container grid grid-cols-3">
               {eventList.length > 0 && filteredData.map((item, index) => {
-                console.log("na", item.status)
                 return (
-                  <div  key={index}>
+                  <div key={index}>
                     <Card sx={{ maxWidth: 345 }} className="my-2">
                       <CardMedia
                         sx={{ height: 300, width: 400 }}
@@ -409,7 +432,7 @@ export default function Admin() {
                       />
                       <CardContent>
                         <Typography gutterBottom variant="h4" className='text-center' >
-                          {item.name}
+                          {item.name.length > 20 ? item.name.slice(0, 15) + '...' : item.name}
                         </Typography>
                         <Typography >
                           ID:{item.id}
@@ -418,7 +441,7 @@ export default function Admin() {
                           Area: {item.area}
                         </Typography>
                         <Typography component="div">
-                          Description:{item.description}
+                          Description: {item.description.length > 20 ? item.description.slice(0, 20) + '...' : item.description}
                         </Typography>
                         <Typography >
                           Begin Date: {parseTimestamp(item.beginDate)}
@@ -426,9 +449,9 @@ export default function Admin() {
                         <Typography >
                           End Date:{parseTimestamp(item.endDate)}
                         </Typography>
-                        <p>
-                          Status: {item.status == true ? "true" : "false"}
-                        </p>
+                        <Typography className='flex gap-[2px]'>
+                          Status: {item.status == true ? <span className='text-green-400'> true </span> : <span className='text-red-400'> false </span>}
+                        </Typography>
                         <div className='flex justify-between '>
                           <Button onClick={() => handleClickOpen(item)} className='py-1' size='' color="warning" variant="contained" endIcon={<EditIcon />}>
                             Edit
@@ -467,7 +490,7 @@ export default function Admin() {
             {isUpdate == false ? "Create Event" : "Update Event"}
           </DialogTitle>
           <DialogContent dividers >
-
+            {err && <div className='text-2xl font-bold text-red-600 text-center'>{err}</div>}
             <div className='max-w-5xl mb-5 mx-auto'>
               <Button
                 variant="contained"

@@ -24,6 +24,15 @@ import * as Yup from "yup";
 import PublicIcon from '@mui/icons-material/Public';
 import PublicOffIcon from '@mui/icons-material/PublicOff';
 import ClearIcon from '@mui/icons-material/Clear';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage"
+import { storage } from '../config/FireBaseConfig';
+import {
+  InputLabel,
+  MenuItem,
+  Select,
+  FormControl
+} from "@mui/material";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -34,6 +43,13 @@ function AccountAdmin() {
   const [filteredData, setFilteredData] = useState([]);
   const [updateData, setUpdateData] = useState();
   const [openUpdate, setOpenUpdate] = React.useState(false);
+  const [isImg, setIsImg] = useState(false);
+  const [click, SetClick] = React.useState(false)
+  const [selectedImage, setSelectedImage] = React.useState();
+  const [progresspercent, setProgresspercent] = useState(0);
+  const dataRole = ["cashier", "admin"]
+  const userString = localStorage.getItem("user");
+  const userObject = JSON.parse(userString);
 
   const handleClickOpenUpdate = (data) => {
     setOpenUpdate(true);
@@ -111,7 +127,7 @@ function AccountAdmin() {
         setOpenUpdate(false)
         dispatch(getShopAccountAsyncApi()).then((response) => {
           if (response.payload != undefined) {
-           
+
           }
         }).catch((error) => {
           // Handle failure case
@@ -140,38 +156,56 @@ function AccountAdmin() {
       role: Yup.string().required(),
     }), onSubmit: values => {
       let DataBody
-
-      DataBody = {
-        username: values.username,
-        password: values.password,
-        name: values.name,
-        role: values.role,
-      }
-      dispatch(PostAccountAsyncApi(DataBody)).then((response) => {
-        setOpen(false);
-        formik.setValues(
-          {
-            username: "",
-            password: "",
-            name: "",
-            role: "",
-          }
-        );
-        formik.setTouched({});
-        formik.setErrors({});
-        if (response.payload != undefined) {
-          dispatch(getAccountAsyncApi()).then((response) => {
-            if (response.payload != undefined) {
-              setFilteredData(response.payload)
+      console.log("dabam1")
+      const storageRef = ref(storage, `Package/${selectedImage.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, selectedImage);
+      uploadTask.on("state_changed",
+        (snapshot) => {
+          const progress =
+            Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          setProgresspercent(progress);
+        },
+        (error) => {
+          alert(error);
+        },
+        () => {
+          console.log("dabam2")
+          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+            console.log("dabam3")
+            DataBody = {
+              username: values.username,
+              password: values.password,
+              name: values.name,
+              role: values.role,
+              image: downloadURL,
             }
-          }).catch((error) => {
-            // Handle failure case
+            dispatch(PostAccountAsyncApi(DataBody)).then((response) => {
+              setOpen(false);
+              formik.setValues(
+                {
+                  username: "",
+                  password: "",
+                  name: "",
+                  role: "",
+                }
+              );
+              formik.setTouched({});
+              formik.setErrors({});
+              if (response.payload != undefined) {
+                dispatch(getAccountAsyncApi()).then((response) => {
+                  if (response.payload != undefined) {
+                    setFilteredData(response.payload)
+                  }
+                }).catch((error) => {
+                  // Handle failure case
+                });
+              }
+            }).catch((error) => {
+              // Handle failure case
+            });
           });
         }
-      }).catch((error) => {
-        // Handle failure case
-      });
-      console.log("ngu", DataBody)
+      );
     },
   });
   const handleClearUpdate = () => {
@@ -187,6 +221,7 @@ function AccountAdmin() {
 
   const handleUpdate = (index) => {
     setEditingIndex(-1);
+
     dispatch(PutAccountAsyncApi(filteredData[index])).then((response) => {
       if (response.payload != undefined) {
         dispatch(getAccountAsyncApi()).then((response) => {
@@ -241,6 +276,8 @@ function AccountAdmin() {
                 <table className="account-table table" style={{ textAlign: 'center' }}>
                   <thead>
                     <tr>
+                      <th scope="col">No</th>
+                      <th scope="col">Img</th>
                       <th scope="col">Username</th>
                       <th scope="col">Password</th>
                       <th scope="col">Name</th>
@@ -250,63 +287,75 @@ function AccountAdmin() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredData.map((item, index) => {
+                    {filteredData && filteredData.map((item, index) => {
                       return (
-                        <tr key={index}>
-                          <th>
-                            {item.username}
-                          </th>
-                          <th>
-                            {editingIndex === index ? (
-                              <input
-                                className="form-control"
-                                type="password"
-                                value={item.password}
-                                onChange={(e) => handleChange(e, index, 'password')}
-                              />
-                            ) : (
-                              item.password
-                            )}
-                          </th>
-                          <th>
-                            {editingIndex === index ? (
-                              <input
-                                className="form-control"
-                                type="text"
-                                value={item.name}
-                                onChange={(e) => handleChange(e, index, 'name')}
-                              />
-                            ) : (
-                              item.name
-                            )}
-                          </th>
-                          <th>
-                            {item.role}
-                          </th>
-                          <th>
-                            {item.status == true ? <PublicIcon /> : <PublicOffIcon />}
-                          </th>
-                          <th>
-                            {editingIndex === index ? (
-                              <div className='flex gap-3'>
-                                <DoneIcon
-                                  onClick={() => handleUpdate(index)}
-                                  className="cursor-pointer"
-                                />
-                                <ClearIcon
-                                  onClick={() => handleClearUpdate()}
-                                  className="cursor-pointer"
-                                />
-                              </div>
 
-                            ) : (
-                              <EditIcon
-                                onClick={() => handleEdit(index)}
-                                className="cursor-pointer"
-                              />
-                            )}
-                          </th>
-                        </tr>
+                        item.username !== userObject.username && (
+                          < tr key={index} >
+                            <th>
+                              {index + 1}
+                            </th>
+                            <th>
+                              <img src={item.image} className='h-32 w-32 mx-auto' />
+                            </th>
+                            <th>
+                              {item.username}
+                            </th>
+                            <th>
+                              {editingIndex === index ? (
+                                <input
+                                  className="form-control"
+                                  type="password"
+                                  value={item.password}
+                                  onChange={(e) => handleChange(e, index, 'password')}
+                                />
+                              ) : (
+                                "*******"
+                              )}
+                            </th>
+                            <th>
+                              {editingIndex === index ? (
+                                <input
+                                  className="form-control"
+                                  type="text"
+                                  value={item.name}
+                                  onChange={(e) => handleChange(e, index, 'name')}
+                                />
+                              ) : (
+                                item.name
+                              )}
+                            </th>
+                            <th>
+                              {item.role}
+                            </th>
+                            <th>
+                              {item.status == true ? <PublicIcon /> : <PublicOffIcon />}
+                            </th>
+                            <th>
+                              {editingIndex === index ? (
+                                <div className='flex gap-3'>
+                                  <button onClick={() => handleUpdate(index)} disabled={filteredData[index].name == '' || filteredData[index].password == '' ? true : false}>
+                                    <DoneIcon
+                                      className="cursor-pointer"
+                                    />
+                                  </button>
+                                  <ClearIcon
+                                    onClick={() => handleClearUpdate()}
+                                    className="cursor-pointer"
+                                  />
+                                </div>
+
+                              ) : (
+                                <EditIcon
+                                  onClick={() => handleEdit(index)}
+                                  className="cursor-pointer"
+                                />
+                              )}
+                            </th>
+                          </tr>
+                        )
+
+
                       );
                     })}
                   </tbody>
@@ -331,7 +380,7 @@ function AccountAdmin() {
                           <th scope="col">{item.shopId}</th>
                           <th scope="col">{item.status == true ? <button className='border-2 cursor-none bg-blue-400 px-3 py-1 -mt-2'>True</button>
                             : <button className='border-2 cursor-none bg-yellow-400 px-3 py-2'>False</button>}</th>
-                          <th scope="col" onClick={() => handleClickOpenUpdate(item)} ><EditIcon className='cursor-pointer' /></th>
+                          <th scope="col" onClick={() => handleClickOpenUpdate(item)} ><DeleteIcon className='cursor-pointer' /></th>
                         </tr>
                       )
                     })}
@@ -358,6 +407,25 @@ function AccountAdmin() {
             Create Shop
           </DialogTitle>
           <DialogContent dividers >
+            <div className='max-w-5xl mb-5 mx-auto'>
+              <Button
+                variant="contained"
+                component="label"
+              >
+                Upload Image
+                <input
+                  type="file"
+                  hidden
+                  onChange={(event) => {
+                    setSelectedImage(event.target.files[0]);
+                    SetClick(true);
+                  }}
+                />
+              </Button>
+            </div>
+            <div className='max-w-5xl my-5 mx-auto'>
+              {selectedImage == undefined ? <div></div> : <img alt="" className='mx-auto h-48 w-48 my-2' src={click == false ? selectedImage : window.URL.createObjectURL(selectedImage)} />}
+            </div>
             <div className='max-w-5xl my-2 mx-auto'>
               <TextField id="outlined-basic" error={formik.touched.username && formik.errors.username ? true : undefined} value={formik.values.username}
                 className='w-full' name="username" onChange={formik.handleChange} onBlur={formik.handleBlur} label="Username" variant="outlined" />
@@ -375,10 +443,25 @@ function AccountAdmin() {
               {formik.errors.name && formik.touched.name && <div className='text mt-1 text-red-600 font-semibold'>{formik.errors.name}</div>}
             </div>
             <div className='max-w-5xl my-2 mx-auto'>
-              <TextField id="outlined-basic" error={formik.touched.role && formik.errors.role ? true : undefined}
-                className='w-full' name="role" onChange={formik.handleChange} onBlur={formik.handleBlur} label="role" variant="outlined"
-                value={formik.values.role} />
-              {formik.errors.role && formik.touched.role && <div className='text mt-1 text-red-600 font-semibold'>{formik.errors.role}</div>}
+              <FormControl className="w-full">
+                <InputLabel size="small">Role</InputLabel>
+                <Select
+                  size="small"
+                  value={
+                    formik.values.role || ""
+                  }
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  label={"Role"}
+                  name="role"
+                >
+                  {dataRole.map((model) => (
+                    <MenuItem key={model} value={model}>
+                      {model}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </div>
           </DialogContent>
           <DialogActions>
@@ -388,7 +471,7 @@ function AccountAdmin() {
           </DialogActions>
         </form>
       </Dialog>
-     
+
       <Dialog
         open={openUpdate}
         onClose={handleCloseUpdate}
@@ -396,11 +479,11 @@ function AccountAdmin() {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-         {"Notification"}
+          {"Notification"}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-          Are you sure you want to update the status of your Account and Shop?
+            Are you sure you want to update the status of your Account and Shop?
           </DialogContentText>
         </DialogContent>
         <DialogActions>

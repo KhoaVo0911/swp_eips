@@ -20,6 +20,9 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
+import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage"
+import { storage } from '../config/FireBaseConfig';
+
 
 function parseToVND(number) {
   let strNumber = number.toString().replace(/[.,]/g, "");
@@ -42,7 +45,11 @@ export default function SettingCashier() {
   const dispatch = useDispatch();
   const { SearchCardList } = useSelector((state) => state.card);
   const [openUpdate, setOpenUpdate] = React.useState(false);
-
+  const [img, setImg] = useState("");
+  const [click, SetClick] = React.useState(false)
+  const [selectedImage, setSelectedImage] = React.useState();
+  const [progresspercent, setProgresspercent] = useState(0);
+  const [selectedValue, setSelectedValue] = React.useState([]);
 
   const handleClickOpenUpdate = (data) => {
     setOpenUpdate(true);
@@ -65,15 +72,33 @@ export default function SettingCashier() {
     });
   }
   const handleUpdateChange = () => {
-    dispatch(PutAccountAsyncApi({ username: userObject.username, password: password, name: name, status: true })).then((response) => {
-      if (response.payload != undefined) {
-        //localStorage.clear();
-
+    const storageRef = ref(storage, `Package/${selectedImage.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, selectedImage);
+    uploadTask.on("state_changed",
+      (snapshot) => {
+        const progress =
+          Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        setProgresspercent(progress);
+      },
+      (error) => {
+        alert(error);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+          setImg(downloadURL)
+          dispatch(PutAccountAsyncApi({ username: userObject.username, role: userObject.role, image: downloadURL, password: password, name: name, status: true })).then((response) => {
+            if (response.payload != undefined) {
+              localStorage.clear();
+              localStorage.setItem('user', JSON.stringify(response.payload));
+              window.location.reload();
+            }
+          }).catch((error) => {
+            // Handle failure case
+          });
+        });
       }
-    }).catch((error) => {
-      // Handle failure case
-    });
-  };
+    );
+  }
   const handleResetChange = () => {
     setName('');
     setPassword('');
@@ -218,7 +243,7 @@ export default function SettingCashier() {
                         }
                       </th>
                       <th className='pt-4 text-xl w-44'>
-                        {isUpdate == false ? parseToVND(balance)
+                        {isUpdate == false ? balance
                           : <div className='w-44 items-center text-center justify-center mx-auto'>
                             <input className="form-control w-32" value={balance}
                               onChange={(e) => setBalance(e.target.value)} />
@@ -306,23 +331,28 @@ export default function SettingCashier() {
                     <h6>General</h6>
                   </div>
 
-                  <div className="col-lg-9 col-12">
-                    <p className="d-flex flex-wrap mb-2">
-                      <strong>Name:</strong>
-                      <span>{userObject.name}</span>
-                    </p>
-                    <p className="d-flex flex-wrap mb-2">
-                      <strong>Username:</strong>
-                      <span >
-                        {userObject.username}
-                      </span>
-                    </p>
-                    <p className="d-flex flex-wrap mb-2">
-                      <strong>Role:</strong>
-                      <span >
-                        {userObject.role}
-                      </span>
-                    </p>
+                  <div className="grid grid-cols-4">
+                    <div className="flex items-center justify-end">
+                      <img src={userObject.image} className="h-48 w-48" />
+                    </div>
+                    <div className='mt-5'>
+                      <p className="">
+                        <strong>Name:</strong>
+                        <span>{userObject.name}</span>
+                      </p>
+                      <p className="">
+                        <strong>Username:</strong>
+                        <span >
+                          {userObject.username}
+                        </span>
+                      </p>
+                      <p className="">
+                        <strong>Role:</strong>
+                        <span >
+                          {userObject.role}
+                        </span>
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -339,6 +369,23 @@ export default function SettingCashier() {
               <div className="tab-content" id="myTabContent">
                 <div className="tab-pane fade show active" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabIndex={0}>
                   <h6 className="mb-4">User Profile</h6>
+                  <Button
+                    variant="contained"
+                    component="label"
+                  >
+                    New Avatar
+                    <input
+                      type="file"
+                      hidden
+                      onChange={(event) => {
+                        setSelectedImage(event.target.files[0]);
+                        SetClick(true);
+                      }}
+                    />
+                  </Button>
+                  <div className='max-w-5xl my-5 mx-auto'>
+                    {selectedImage == undefined ? <div></div> : <img alt="" className='mx-auto h-48 w-48 my-2' src={click == false ? selectedImage : window.URL.createObjectURL(selectedImage)} />}
+                  </div>
                   <input className="form-control mt-4" name="profile-email" id="profile-email" disabled placeholder={userObject.username} />
                   <input value={password} onChange={(e) => setPassword(e.target.value)} className="form-control mt-4" type="password" name="profile-email" id="profile-email" placeholder="New Password" />
                   <input value={name} onChange={(e) => setName(e.target.value)} className="form-control mt-4" type="text" name="profile-name" id="profile-name" placeholder="New Name" />

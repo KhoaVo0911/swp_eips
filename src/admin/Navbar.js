@@ -85,7 +85,7 @@ export default function Navbar() {
                     </NavLink>
                     <div className="hidden w-full lg:block md:w-auto" id="navbar-default">
                         <ul className="flex mt-4">
-                            <img src="https://st.quantrimang.com/photos/image/072015/22/avatar.jpg" className='-mt-[10px]  h-12 w-12 rounded-full' />
+                            <img src={userObject.image} className='-mt-[10px]  h-12 w-12 rounded-full' />
                             <div>
                                 <p className='font-bold text-2xl ml-4'>{userObject.name} </p>
                             </div>

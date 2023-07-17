@@ -24,7 +24,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Navbar from './Navbar';
 import EditIcon from '@mui/icons-material/Edit';
-import { EventAction, getEventImgListAsyncApi } from '../services/event/eventSlice';
+import { EventAction, PostImgEventAsyncApi, getEventImgListAsyncApi } from '../services/event/eventSlice';
 import {
   InputLabel,
   MenuItem,
@@ -35,6 +35,8 @@ import "./Slider.css"
 import { accountAction } from '../services/account/accountSlice';
 import { ProductAction } from '../services/product/productSlice';
 import DialogContentText from '@mui/material/DialogContentText';
+import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage"
+import { storage } from '../config/FireBaseConfig';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -63,11 +65,19 @@ function EventAdmin() {
   const { CardList } = useSelector((state) => state.card)
   const [openUpdate, setOpenUpdate] = React.useState(false);
   const [update50Card, setUpdate50Card] = React.useState(0);
+  const [isImg, setIsImg] = useState(false);
+  const [click, SetClick] = React.useState(false)
+  const [selectedImage, setSelectedImage] = React.useState();
+  const [progresspercent, setProgresspercent] = useState(0);
 
 
   const handleClickOpenUpdate = (data) => {
     setOpenUpdate(true);
     setUpdate50Card(data)
+  };
+  const handleClickOpenImage = (data) => {
+    setIsImg(!isImg);
+    setSelectedImage()
   };
 
   const handleCloseUpdate = () => {
@@ -149,9 +159,13 @@ function EventAdmin() {
 
   const handleClickOpen = (data) => {
     setOpen(true);
+    setSelectedImage();
+    setIsImg(false);
+    SetClick(false)
     if (data.eventId) {
       setIsUpdate(true);
       setIdShop(data.id)
+      setSelectedImage(data.image);
       formik.setValues(
         {
           id: data.id,
@@ -197,82 +211,146 @@ function EventAdmin() {
       area: Yup.string().min(5, "Too Short!").max(4000, "Too Long!").required(),
       description: Yup.string().min(5, "Too Short!").max(4000, "Too Long!").required(),
     }), onSubmit: values => {
-      let DataBody
       let DataBodyUpdate
-      DataBody = {
-        eventId: param.id,
-        id: values.id,
-        name: values.name,
-        area: values.area,
-        des: values.description,
-        status: true
-      }
-      DataBodyUpdate = {
-        eventId: param.id,
-        id: values.id,
-        name: values.name,
-        area: values.area,
-        des: values.description,
-        status: values.status
-      }
-      if (isUpdate == false) {
-        dispatch(PostShopAsyncApi(DataBody)).then((response) => {
-          setOpen(false);
-          formik.setValues(
-            {
-              id: "",
-              name: "",
-              description: "",
-              area: "",
-              status: true
+      let DataBody
+      console.log("dabam1")
+      const storageRef = ref(storage, `Package/${selectedImage.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, selectedImage);
+      uploadTask.on("state_changed",
+        (snapshot) => {
+          const progress =
+            Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          setProgresspercent(progress);
+        },
+        (error) => {
+          alert(error);
+        },
+        () => {
+          console.log("dabam2")
+          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+            console.log("dabam3")
+            DataBody = {
+              eventId: param.id,
+              id: values.id,
+              name: values.name,
+              area: values.area,
+              des: values.description,
+              status: true,
+              image: click == true ? downloadURL : selectedImage,
             }
-          );
-          formik.setTouched({});
-          formik.setErrors({});
-          if (response.payload != undefined) {
-            dispatch(getShopAsyncApi(param.id)).then((response) => {
-              if (response.payload != undefined) {
-                setFilteredData(response.payload)
-              }
-            }).catch((error) => {
-              // Handle failure case
-            });
-          }
-        }).catch((error) => {
-          // Handle failure case
-        });
-      } else {
-        dispatch(PutShopAsyncApi(DataBodyUpdate)).then((response) => {
-          setOpen(false);
-          formik.setValues(
-            {
-              id: "",
-              name: "",
-              description: "",
-              area: "",
-              status: true
+            DataBodyUpdate = {
+              eventId: param.id,
+              id: values.id,
+              name: values.name,
+              area: values.area,
+              des: values.description,
+              status: values.status,
+              image: click == true ? downloadURL : selectedImage,
             }
-          );
-          formik.setTouched({});
-          formik.setErrors({});
-          if (response.payload != undefined) {
-            dispatch(getShopAsyncApi(param.id)).then((response) => {
-              if (response.payload != undefined) {
-                setFilteredData(response.payload)
-              }
-            }).catch((error) => {
-              // Handle failure case
-            });
-          }
-        }).catch((error) => {
-          // Handle failure case
-        });
-      }
 
-
-      console.log("ngu", DataBody)
+            if (isUpdate == false) {
+              dispatch(PostShopAsyncApi(DataBody)).then((response) => {
+                setOpen(false);
+                formik.setValues(
+                  {
+                    id: "",
+                    name: "",
+                    description: "",
+                    area: "",
+                    status: true
+                  }
+                );
+                formik.setTouched({});
+                formik.setErrors({});
+                if (response.payload != undefined) {
+                  dispatch(getShopAsyncApi(param.id)).then((response) => {
+                    if (response.payload != undefined) {
+                      setFilteredData(response.payload)
+                    }
+                  }).catch((error) => {
+                    // Handle failure case
+                  });
+                }
+              }).catch((error) => {
+                // Handle failure case
+              });
+            } else {
+              dispatch(PutShopAsyncApi(DataBodyUpdate)).then((response) => {
+                setOpen(false);
+                formik.setValues(
+                  {
+                    id: "",
+                    name: "",
+                    description: "",
+                    area: "",
+                    status: true
+                  }
+                );
+                formik.setTouched({});
+                formik.setErrors({});
+                if (response.payload != undefined) {
+                  dispatch(getShopAsyncApi(param.id)).then((response) => {
+                    if (response.payload != undefined) {
+                      setFilteredData(response.payload)
+                    }
+                  }).catch((error) => {
+                    // Handle failure case
+                  });
+                }
+              }).catch((error) => {
+                // Handle failure case
+              });
+            }
+          });
+        }
+      );
     },
   });
+
+  const HandleUploadImgEvent = () => {
+    let DataBody
+    console.log("dabam1")
+    const storageRef = ref(storage, `Package/${selectedImage.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, selectedImage);
+    uploadTask.on("state_changed",
+      (snapshot) => {
+        const progress =
+          Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        setProgresspercent(progress);
+      },
+      (error) => {
+        alert(error);
+      },
+      () => {
+        console.log("dabam2")
+        getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+          console.log("dabam3")
+          DataBody = {
+            eventId: param.id,
+            img: downloadURL,
+          }
+          dispatch(PostImgEventAsyncApi(DataBody)).then((response) => {
+            SetClick(false)
+            setSelectedImage()
+            setIsImg(false);
+            if (response.payload != undefined) {
+              dispatch(getEventImgListAsyncApi(param.id)).then((response) => {
+                if (response.payload != undefined) {
+
+                }
+              }).catch((error) => {
+                // Handle failure case
+              });
+            }
+          }).catch((error) => {
+            // Handle failure case
+          });
+          console.log("ngu", DataBody)
+        });
+      }
+    );
+
+  }
   return (
     <div>
       <Navbar />
@@ -303,7 +381,17 @@ function EventAdmin() {
                     Search
                   </button>
                 </form>
+                <div className='max-w-5xl my-5 mx-auto'>
+                  {selectedImage == undefined ? null : <img alt="" className='mx-auto h-48 w-48 my-2' src={click == false ? selectedImage : window.URL.createObjectURL(selectedImage)} />}
+                  {selectedImage == undefined ? null : <Button
+                    variant="contained"
+                    component="label"
+                    onClick={HandleUploadImgEvent}
+                  >
+                    Update
+                  </Button>}
 
+                </div>
                 <div>
                   <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={handleClickOpen}>
                     Create Shop
@@ -319,6 +407,29 @@ function EventAdmin() {
                     Create 50 Cards
                   </button>
                 </div>
+                <div>
+                  <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={() => handleClickOpenImage()}>
+                    Add Img to Event
+                  </button>
+
+                </div>
+                {isImg == true ? <div>
+                  <Button
+                    variant="contained"
+                    component="label"
+                    className='nav-link form-control mb-3'
+                  >
+                    Upload Image
+                    <input
+                      type="file"
+                      hidden
+                      onChange={(event) => {
+                        setSelectedImage(event.target.files[0]);
+                        SetClick(true);
+                      }}
+                    />
+                  </Button>
+                </div> : null}
               </div>
 
               <div className="custom-block bg-white">
@@ -328,25 +439,27 @@ function EventAdmin() {
                   <table className="account-table table" style={{ textAlign: 'center' }}>
                     <thead>
                       <tr>
-                        <th scope="col">Number</th>
-                        <th scope="col">ID</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Description</th>
-                        <th scope="col">Area</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">View</th>
+                        <th className='text-base' scope="col">Number</th>
+                        <th className='text-base' scope="col">ID</th>
+                        <th className='text-base' scope="col">Img</th>
+                        <th className='text-base' scope="col">Name</th>
+                        <th className='text-base' scope="col">Description</th>
+                        <th className='text-base' scope="col">Area</th>
+                        <th className='text-base' scope="col">Status</th>
+                        <th className='text-base' scope="col">View</th>
                       </tr>
                     </thead>
                     <tbody>
                       {filteredData.map((item, index) => {
                         return (
                           <tr key={index}>
-                            <td>{index + 1}</td>
-                            <td>{item.id}</td>
-                            <td>{item.name}</td>
-                            <td>{item.des}</td>
-                            <td>{item.area}</td>
-                            <td>{item.status == true ? <Tooltip title="Public">
+                            <td className='font-bold text-base'>{index + 1}</td>
+                            <td className='text-base'>{item.id}</td>
+                            <img src={item.image} className='h-32 w-32 mx-auto' />
+                            <td className='text-base'>{item.name}</td>
+                            <td className='text-base'>{item.des}</td>
+                            <td className='text-base'>{item.area}</td>
+                            <td >{item.status == true ? <Tooltip title="Public">
                               <IconButton >
                                 <PublicIcon className="" />
                               </IconButton>
@@ -357,7 +470,7 @@ function EventAdmin() {
                                 </IconButton>
                               </Tooltip>
                             } </td>
-                            <td className='flex text-center justify-center items-center mx-auto'>
+                            <td className=''>
                               <Tooltip title="Product">
                                 <Link to={{
                                   pathname: `/shopadmin/${item.id}`,
@@ -438,6 +551,25 @@ function EventAdmin() {
             {isUpdate == false ? "Create Shop" : "Update Shop"}
           </DialogTitle>
           <DialogContent dividers >
+            <div className='max-w-5xl mb-5 mx-auto'>
+              <Button
+                variant="contained"
+                component="label"
+              >
+                Upload Image
+                <input
+                  type="file"
+                  hidden
+                  onChange={(event) => {
+                    setSelectedImage(event.target.files[0]);
+                    SetClick(true);
+                  }}
+                />
+              </Button>
+            </div>
+            <div className='max-w-5xl my-5 mx-auto'>
+              {selectedImage == undefined ? <div></div> : <img alt="" className='mx-auto h-48 w-48 my-2' src={click == false ? selectedImage : window.URL.createObjectURL(selectedImage)} />}
+            </div>
             <div className='max-w-5xl my-2 mx-auto'>
               <TextField disabled={isUpdate == true ? true : false} id="outlined-basic" error={formik.touched.id && formik.errors.id ? true : undefined} value={formik.values.id}
                 className='w-full' name="id" onChange={formik.handleChange} onBlur={formik.handleBlur} label="id" variant="outlined" />

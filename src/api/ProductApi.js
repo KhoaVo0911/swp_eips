@@ -13,7 +13,8 @@ const GetProductApi = async (id) => {
 
 export const GetListProductApi = async (body) => {
   try {
-    const response = await axios.post(`${API_URL}/sale/product/all`, body);
+    //const response = await axios.post(`${API_URL}/sale/product/all`, body);
+    const response = await axios.get(`${API_URL}/general/${body}`);
     return response.data;
   } catch (error) {
     throw error;

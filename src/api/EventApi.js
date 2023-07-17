@@ -37,6 +37,14 @@ export const PostEventApi = async (body) => {
     throw error;
   }
 };
+export const PostImgEventApi = async (body) => {
+  try {
+    const response = await axios.post(`${API_URL}/admin/image`, body);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const PutEventApi = async (body) => {
   try {
@@ -46,5 +54,6 @@ export const PutEventApi = async (body) => {
     throw error;
   }
 };
+
 
 export default GetEventApi;

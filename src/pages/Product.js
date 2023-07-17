@@ -45,6 +45,7 @@ import { CycloneOutlined } from "@mui/icons-material";
 import { accountAction } from "../services/account/accountSlice";
 import { CardAction } from "../services/card/cardSlice";
 import { EventAction } from "../services/event/eventSlice";
+import GetEventApi from "../api/EventApi";
 
 function parseToVND(number) {
   let strNumber = number.toString().replace(/[.,]/g, "");
@@ -78,7 +79,7 @@ function Product() {
   const dispatch = useDispatch();
   const userString = localStorage.getItem("user");
   const userObject = JSON.parse(userString);
-  const dataCategory = ["Food", "Drink", "Combo", "Other"]
+  const dataCategory = ["Food", "Drink", "Other"]
   const { ProductListAll, ProductSold, Revenue } = useSelector((state) => state.product)
   const { shopByUsername } = useSelector((state) => state.shop)
   const handleDateStartChange = (date) => {
@@ -99,7 +100,8 @@ function Product() {
   useEffect(() => {
     dispatch(getShopByUsernameAsyncApi(userObject.username)).then((response) => {
       if (response.payload != undefined) {
-        dispatch(getAllProductAsyncApi({ shopId: response.payload.id })).then((response) => {
+        // dispatch(getAllProductAsyncApi({ shopId: response.payload.id })).then((response) => {
+        dispatch(getAllProductAsyncApi(response.payload.id)).then((response) => {
           if (response.payload != undefined) {
             setFilteredData(response.payload)
           }
@@ -138,6 +140,7 @@ function Product() {
     setOpen(true);
     setOpenCombo(false)
     setSelectedImage()
+    setIsUpdate(false)
     if (data.id) {
       setIsUpdate(true)
       setProductId(data.id)
@@ -222,7 +225,8 @@ function Product() {
               formik.setTouched({});
               formik.setErrors({});
               if (response.payload != undefined) {
-                dispatch(getAllProductAsyncApi({ shopId: shopByUsername.id })).then((response) => {
+                //dispatch(getAllProductAsyncApi({ shopId: shopByUsername.id })).then((response) => {
+                dispatch(getAllProductAsyncApi(shopByUsername.id)).then((response) => {
                   if (response.payload != undefined) {
                     setFilteredData(response.payload)
                   }
@@ -350,7 +354,8 @@ function Product() {
             formik.setTouched({});
             formik.setErrors({});
             if (response.payload != undefined) {
-              dispatch(getAllProductAsyncApi({ shopId: shopByUsername.id })).then((response) => {
+              // dispatch(getAllProductAsyncApi({ shopId: shopByUsername.id })).then((response) => {
+              dispatch(getAllProductAsyncApi(shopByUsername)).then((response) => {
                 if (response.payload != undefined) {
                   setFilteredData(response.payload)
                 }
@@ -377,7 +382,8 @@ function Product() {
             formik.setTouched({});
             formik.setErrors({});
             if (response.payload != undefined) {
-              dispatch(getAllProductAsyncApi({ shopId: shopByUsername.id })).then((response) => {
+              //  dispatch(getAllProductAsyncApi({ shopId: shopByUsername.id })).then((response) => {
+              dispatch(getAllProductAsyncApi(shopByUsername.id)).then((response) => {
                 if (response.payload != undefined) {
                   setFilteredData(response.payload)
                 }
@@ -438,7 +444,8 @@ function Product() {
                   formik.setTouched({});
                   formik.setErrors({});
                   if (response.payload != undefined) {
-                    dispatch(getAllProductAsyncApi({ shopId: shopByUsername.id })).then((response) => {
+                    //dispatch(getAllProductAsyncApi({ shopId: shopByUsername.id })).then((response) => {
+                    dispatch(getAllProductAsyncApi(shopByUsername.id)).then((response) => {
                       if (response.payload != undefined) {
                         setFilteredData(response.payload)
                       }
@@ -465,7 +472,8 @@ function Product() {
                   formik.setTouched({});
                   formik.setErrors({});
                   if (response.payload != undefined) {
-                    dispatch(getAllProductAsyncApi({ shopId: shopByUsername.id })).then((response) => {
+                    //dispatch(getAllProductAsyncApi({ shopId: shopByUsername.id })).then((response) => {
+                    dispatch(getAllProductAsyncApi(shopByUsername.id)).then((response) => {
                       if (response.payload != undefined) {
                         setFilteredData(response.payload)
                       }
@@ -728,7 +736,7 @@ function Product() {
                             <td scope="row" className="mx-2 px-2">
                               <input
                                 className="form-control"
-                                type="text"
+                                type="number"
                                 name="Price"
                                 value={priceCombo}
                                 onChange={(e) => setPriceCombo(e.target.value)}
@@ -842,7 +850,7 @@ function Product() {
             </div>
             <div className='max-w-5xl my-2 mx-auto'>
               <TextField id="outlined-basic" error={formik.touched.price && formik.errors.price ? true : undefined} value={formik.values.price}
-                className='w-full' name="price" onChange={formik.handleChange} onBlur={formik.handleBlur} label="price" variant="outlined" />
+               type="number"  className='w-full' name="price" onChange={formik.handleChange} onBlur={formik.handleBlur} label="price" variant="outlined" />
               {formik.errors.price && formik.touched.price && <div className='text mt-1 text-red-600 font-semibold'>{formik.errors.price}</div>}
             </div>
             <div className='max-w-5xl my-2 mx-auto'>
