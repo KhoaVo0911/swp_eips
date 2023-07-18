@@ -13,7 +13,7 @@ export default function SimpleSlider() {
     console.log("eventListImg", eventListImg)
     return (
         <div className="max-w-full ">
-            <Slider  {...settings} className="">
+            {eventListImg >= 3 ? <Slider  {...settings} className="">
                 {eventListImg && eventListImg.map((item, index) => {
                     return (
                         <div key={index} className="relative pt-16  flex content-center items-center justify-centers ">
@@ -24,7 +24,20 @@ export default function SimpleSlider() {
                         </div>
                     )
                 })}
-            </Slider>
+            </Slider> :
+                <div className='flex'>{eventListImg && eventListImg.map((item, index) => {
+                    return (
+                        <div key={index} className="relative pt-16  flex content-center items-center justify-centers ">
+                            <div className=" bg-cover bg-center absolute top-0 w-full h-full" />
+                            <div className="container max-w-8xl relative mx-auto">
+                                <img src={item.img} />
+                            </div>
+                        </div>
+                    )
+                })}
+                </div>
+            }
+
         </div>
     );
 }

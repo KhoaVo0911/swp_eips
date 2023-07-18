@@ -434,13 +434,20 @@ function EventAdmin() {
             <div className="row my-4">
               <div className="grid grid-cols-2 gap-5">
                 <div className='mb-10'>
-                  <Slider {...settings}>
+                  {eventListImg >= 3 ? <Slider {...settings}>
                     {eventListImg && eventListImg.map((item, index) => {
                       return (
                         <img src={item.img} className='h-64 w-44 p-1' />
                       )
                     })}
-                  </Slider>
+                  </Slider> :
+                    <div className='flex'>{eventListImg && eventListImg.map((item, index) => {
+                      return (
+                        <img src={item.img} className='h-64 w-44 p-1' />
+                      )
+                    })}
+                    </div>
+                  }
                 </div>
                 <div className="pb-5">
 
@@ -797,7 +804,7 @@ function EventAdmin() {
                   </tr>
                 </thead>
                 <tbody>
-                  {OrerList && OrerList.map((item, index) => {
+                  {OrerList.length > 0 && OrerList.map((item, index) => {
                     return (
                       <tr key={index}>
                         <td className='font-bold text-base'>{index + 1}</td>

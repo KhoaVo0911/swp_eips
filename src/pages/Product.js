@@ -951,7 +951,7 @@ function Product() {
                   </tr>
                 </thead>
                 <tbody>
-                  {OrerList && OrerList.map((item, index) => {
+                  {OrerList.length > 0 && OrerList.map((item, index) => {
                     return (
                       <tr key={index}>
                         <td className='font-bold text-base'>{index + 1}</td>
