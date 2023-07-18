@@ -55,7 +55,7 @@ export default function Navbar() {
                         </div>
 
                     </NavLink>
-                    <NavLink
+                    {/* <NavLink
                         style={({ isActive }) =>
                             isActive ? { color: "#60a5fa" } : undefined
                         }
@@ -68,7 +68,7 @@ export default function Navbar() {
                         </div>
 
 
-                    </NavLink>
+                    </NavLink> */}
                     <NavLink
                         style={({ isActive }) =>
                             isActive ? { color: "#60a5fa" } : undefined

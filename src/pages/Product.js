@@ -7,7 +7,7 @@ import axios from "axios";
 import Navbar from "../product/Navbar";
 import { PostComboProductAsyncApi, PostProductAsyncApi, PostRevenueAsyncApi, ProductAction, PutProductAsyncApi, getAllProductAsyncApi, getProductAsyncApi, getProductSoldAsyncApi } from "../services/product/productSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { ShopAction, getShopByUsernameAsyncApi } from "../services/shop/shopSlice";
+import { GetListOrderAsyncApi, ShopAction, getShopByUsernameAsyncApi } from "../services/shop/shopSlice";
 import PublicIcon from '@mui/icons-material/Public';
 import PublicOffIcon from '@mui/icons-material/PublicOff';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
@@ -46,11 +46,19 @@ import { accountAction } from "../services/account/accountSlice";
 import { CardAction } from "../services/card/cardSlice";
 import { EventAction } from "../services/event/eventSlice";
 import GetEventApi from "../api/EventApi";
+import DialogContentText from '@mui/material/DialogContentText';
 
 function parseToVND(number) {
   let strNumber = number.toString().replace(/[.,]/g, "");
   strNumber = strNumber.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   return strNumber;
+}
+
+function parseTimestamp(timestamp) {
+  const date = new Date(timestamp);
+  const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+  const formattedDate = new Intl.DateTimeFormat('en-GB', options).format(date);
+  return formattedDate;
 }
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -81,7 +89,21 @@ function Product() {
   const userObject = JSON.parse(userString);
   const dataCategory = ["Food", "Drink", "Other"]
   const { ProductListAll, ProductSold, Revenue } = useSelector((state) => state.product)
-  const { shopByUsername } = useSelector((state) => state.shop)
+  const { shopByUsername, OrerList } = useSelector((state) => state.shop)
+  const [openOrder, setOpenOrder] = useState(false);
+
+  const handleClickOpenOrder = () => {
+    setOpenOrder(true);
+    dispatch(GetListOrderAsyncApi(shopByUsername.id)).then((response) => {
+      if (response.payload != undefined) {
+      }
+    }).catch((error) => {
+      // Handle failure case
+    });
+  };
+  const handleCloseOrder = () => {
+    setOpenOrder(false);
+  };
   const handleDateStartChange = (date) => {
     const day = dayjs(date).format('YYYY-MM-DD');
     setSelectedDateStart(day);
@@ -528,9 +550,9 @@ function Product() {
                 </form>
                 <div className="my-4 float-right">
                   <Stack direction="row" spacing={2}>
-                    {/* <Button onClick={handleClickOpen} variant="contained" startIcon={<BarChartIcon />}>
-                      Revenus
-                    </Button> */}
+                    <Button onClick={handleClickOpenOrder} variant="contained" startIcon={<BarChartIcon />}>
+                      Order List
+                    </Button>
                     <Button onClick={handleClickOpen} color="success" variant="contained" startIcon={<AddIcon />}>
                       Create Product
                     </Button>
@@ -820,7 +842,7 @@ function Product() {
       >
         <form onSubmit={formik.handleSubmit}>
           <DialogTitle id="" >
-            Create Product
+            {isUpdate == true ? "Update Product" : "Create Product"}
           </DialogTitle>
           <DialogContent dividers >
             <div className='max-w-5xl mb-5 mx-auto'>
@@ -850,7 +872,7 @@ function Product() {
             </div>
             <div className='max-w-5xl my-2 mx-auto'>
               <TextField id="outlined-basic" error={formik.touched.price && formik.errors.price ? true : undefined} value={formik.values.price}
-               type="number"  className='w-full' name="price" onChange={formik.handleChange} onBlur={formik.handleBlur} label="price" variant="outlined" />
+                type="number" className='w-full' name="price" onChange={formik.handleChange} onBlur={formik.handleBlur} label="price" variant="outlined" />
               {formik.errors.price && formik.touched.price && <div className='text mt-1 text-red-600 font-semibold'>{formik.errors.price}</div>}
             </div>
             <div className='max-w-5xl my-2 mx-auto'>
@@ -902,6 +924,52 @@ function Product() {
             </Button>
           </DialogActions>
         </form>
+      </Dialog>
+      <Dialog
+        open={openOrder}
+        onClose={handleCloseOrder}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        fullWidth
+        size="xl"
+      >
+        <DialogTitle id="" >
+          List Order
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            <div className="table-responsive">
+              <table className="account-table table" style={{ textAlign: 'center' }}>
+                <thead>
+                  <tr>
+                    <th className='text-base' scope="col">Number</th>
+                    <th className='text-base' scope="col">ID</th>
+                    <th className='text-base' scope="col">Shop Id</th>
+                    <th className='text-base' scope="col">Card Id</th>
+                    <th className='text-base' scope="col">Time</th>
+                    <th className='text-base' scope="col">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {OrerList && OrerList.map((item, index) => {
+                    return (
+                      <tr key={index}>
+                        <td className='font-bold text-base'>{index + 1}</td>
+                        <td className='text-base'>{item.id}</td>
+                        <td className='text-base'>{item.shopId}</td>
+                        <td className='text-base'>{item.cardId}</td>
+                        <td className='text-base'>{parseTimestamp(item.beginDate)}</td>
+                        <td className=''>
+                          {parseToVND(item.total) + " Vnđ"}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </DialogContentText>
+        </DialogContent>
       </Dialog>
     </div >
   );

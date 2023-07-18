@@ -54,7 +54,14 @@ export const PostAccountApi = async (body) => {
     throw error;
   }
 };
-
+export const PostAccountForSaleApi = async (body) => {
+  try {
+    const response = await axios.post(`${API_URL}/admin/account/set`, body);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 export const PutAccountApi = async (body) => {
   try {
     const response = await axios.post(`${API_URL}/admin/account/update`, body);

@@ -36,6 +36,14 @@ export const PutShopApi = async (body) => {
     throw error;
   }
 };
+export const GetListOrderApi = async (id) => {
+  try {
+    const response = await axios.get(`${API_URL}/general/order/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 
 export default GetShopApi;

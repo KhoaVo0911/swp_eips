@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../css/styles.admin.css';
-import { Link, useLocation, useParams } from 'react-router-dom';
-import { PostShopAsyncApi, PutShopAsyncApi, ShopAction, getShopAsyncApi } from '../services/shop/shopSlice';
+import { Link, useLoaderData, useLocation, useParams } from 'react-router-dom';
+import { GetListOrderAsyncApi, PostShopAsyncApi, PutShopAsyncApi, ShopAction, getShopAsyncApi } from '../services/shop/shopSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import PublicIcon from '@mui/icons-material/Public';
 import PublicOffIcon from '@mui/icons-material/PublicOff';
@@ -37,6 +37,55 @@ import { ProductAction } from '../services/product/productSlice';
 import DialogContentText from '@mui/material/DialogContentText';
 import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage"
 import { storage } from '../config/FireBaseConfig';
+import PropTypes from 'prop-types';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import InputBase from '@mui/material/InputBase';
+import SearchIcon from '@mui/icons-material/Search';
+import Paper from '@mui/material/Paper';
+import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
+
+function CustomTabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+CustomTabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
+function parseTimestamp(timestamp) {
+  const date = new Date(timestamp);
+  const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+  const formattedDate = new Intl.DateTimeFormat('en-GB', options).format(date);
+  return formattedDate;
+}
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -51,17 +100,22 @@ function parseToVND(number) {
 function EventAdmin() {
   const [openCard, setOpenCard] = React.useState(false);
   const param = useParams();
-  console.log("haha", param)
+  const location = useLocation();
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+  const [search, setSearch] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
-  const location = useLocation();
   const eventCotent = location.state;
   const [open, setOpen] = React.useState(false);
   const dispatch = useDispatch();
   const [isUpdate, setIsUpdate] = React.useState(false);
   const [idShop, setIdShop] = React.useState(0);
   const { eventListImg } = useSelector((state) => state.event)
-  const { shopList } = useSelector((state) => state.shop)
+  const { shopList, OrerList } = useSelector((state) => state.shop)
   const { CardList } = useSelector((state) => state.card)
   const [openUpdate, setOpenUpdate] = React.useState(false);
   const [update50Card, setUpdate50Card] = React.useState(0);
@@ -69,21 +123,41 @@ function EventAdmin() {
   const [click, SetClick] = React.useState(false)
   const [selectedImage, setSelectedImage] = React.useState();
   const [progresspercent, setProgresspercent] = useState(0);
+  const [openOrder, setOpenOrder] = useState(false);
+
+  const handleClickOpenOrder = (data) => {
+    setOpenOrder(true);
+    dispatch(GetListOrderAsyncApi(data.id)).then((response) => {
+      if (response.payload != undefined) {
+      }
+    }).catch((error) => {
+      // Handle failure case
+    });
+  };
+  const handleCloseOrder = () => {
+    setOpenOrder(false);
+    setUpdate50Card(0)
+  };
 
 
   const handleClickOpenUpdate = (data) => {
     setOpenUpdate(true);
     setUpdate50Card(data)
   };
-  const handleClickOpenImage = (data) => {
-    setIsImg(!isImg);
-    setSelectedImage()
-  };
-
   const handleCloseUpdate = () => {
     setOpenUpdate(false);
     setUpdate50Card(0)
   };
+
+  const handleClickOpenImage = (data) => {
+    setIsImg(true);
+    setSelectedImage()
+  };
+  const handleClickOpenClose = (data) => {
+    setIsImg(false);
+    setSelectedImage()
+  };
+
 
   const settings = {
     dots: true, // Hiển thị chấm chỉ mục
@@ -93,7 +167,7 @@ function EventAdmin() {
   };
 
   useEffect(() => {
-    console.log("haha1", param)
+    console.log("haha1", param, location)
     dispatch(getShopAsyncApi(param.id)).then((response) => {
       if (response.payload != undefined) {
         setFilteredData(response.payload)
@@ -349,7 +423,6 @@ function EventAdmin() {
         });
       }
     );
-
   }
   return (
     <div>
@@ -359,155 +432,150 @@ function EventAdmin() {
         <div className="row">
           <main className="main-wrapper ms-sm-auto py-4 px-md-4 border-start">
             <div className="row my-4">
-              <div className="col-lg-6 col-6">
-                <div className="title-group mb-3" style={{ textAlign: 'center' }}>
-                  <h1 className="h2 mb-0">{eventCotent != undefined ? eventCotent.name : null}</h1>
-                </div>
+              <div className="grid grid-cols-2 gap-5">
                 <div className='mb-10'>
                   <Slider {...settings}>
                     {eventListImg && eventListImg.map((item, index) => {
                       return (
-                        <img src={item.img} className='h-52 w-32 p-1' />
+                        <img src={item.img} className='h-64 w-44 p-1' />
                       )
                     })}
                   </Slider>
                 </div>
+                <div className="pb-5">
 
+                  {eventCotent && <div className='bg-white px-4 py-1 mx-36'>
+                    <Typography gutterBottom variant="h4" className='text-center' >
+                      {eventCotent.name}
+                    </Typography>
+                    <Typography variant="h6">
+                      <strong>ID:</strong>  {eventCotent.id}
+                    </Typography>
+                    <Typography variant="h6">
+                      <strong>Area:</strong> {eventCotent.area}
+                    </Typography>
+                    <Typography variant="h6">
+                      <strong>Description:</strong>{eventCotent.description.length > 20 ? eventCotent.description.slice(0, 20) + '...' : eventCotent.description}
+                    </Typography>
+                    <Typography variant="h6">
+                      <strong>Begin Date:</strong> {parseTimestamp(eventCotent.beginDate)}
+                    </Typography>
+                    <Typography variant="h6">
+                      <strong>End Date:</strong> {parseTimestamp(eventCotent.endDate)}
+                    </Typography>
+                    <Typography variant="h6" className='flex gap-[2px]'>
+                      <strong>Status:</strong>  {eventCotent.status == true ? <span className='text-green-400'> true </span> : <span className='text-red-400'> false </span>}
+                    </Typography>
+                  </div>}
+                </div>
               </div>
-              <div className="col-lg-6 col-6" style={{ paddingRight: '300px' }}>
-                <form className="custom-form input-group mb-3" action="#" method="get" role="form">
-                  <input onChange={handleSearchInputChange} className="form-control" name="search" type="text" placeholder="Search" aria-label="Search" />
-                  <button style={{ width: '100px' }} type="submit">
-                    Search
-                  </button>
-                </form>
-                <div className='max-w-5xl my-5 mx-auto'>
-                  {isImg && selectedImage !== undefined && (
-                    <>
-                      <img
-                        alt=""
-                        className="mx-auto h-48 w-48 my-2"
-                        src={
-                          click === false
-                            ? selectedImage
-                            : window.URL.createObjectURL(selectedImage)
-                        }
-                      />
-                      <Button
-                        variant="contained"
-                        component="label"
-                        onClick={HandleUploadImgEvent}
-                      >
-                        Update
-                      </Button>
-                    </>
-                  )}
 
-                </div>
-                <div>
-                  <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={handleClickOpen}>
-                    Create Shop
-                  </button>
-                </div>
-                <div>
-                  <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={() => handleClickOpenUpdate(1)}>
-                    Create Card
-                  </button>
-                </div>
-                <div>
-                  <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={() => handleClickOpenUpdate(2)}>
-                    Create 50 Cards
-                  </button>
-                </div>
-                <div>
-                  <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={() => handleClickOpenImage()}>
-                    Add Img to Event
-                  </button>
+              <Box sx={{ width: '100%' }} className="bg-white">
+                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                  <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+                    <Tab label="Shop" {...a11yProps(0)} />
+                    <Tab label="Card" {...a11yProps(1)} />
+                  </Tabs>
+                </Box>
+                <CustomTabPanel value={value} index={0}>
 
-                </div>
-                {isImg == true ? <div>
-                  <Button
-                    variant="contained"
-                    component="label"
-                    className='nav-link form-control mb-3'
+                  <div className='flex gap-5'>
+                    <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={handleClickOpen}>
+                      Create Shop
+                    </button>
+                    <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={() => handleClickOpenUpdate(1)}>
+                      Create Card
+                    </button>
+                    <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={() => handleClickOpenUpdate(2)}>
+                      Create 50 Cards
+                    </button>
+                    <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={() => handleClickOpenImage()}>
+                      Add Img to Event
+                    </button>
+                  </div>
+                  {/* <Paper
+                    component="form"
+                    sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 300 }}
                   >
-                    Upload Image
-                    <input
-                      type="file"
-                      hidden
-                      onChange={(event) => {
-                        setSelectedImage(event.target.files[0]);
-                        SetClick(true);
-                      }}
+                    <InputBase
+                      sx={{ ml: 1, flex: 1 }}
+                      placeholder="Search"
+                      value={searchQuery}
+                      onChange={handleSearchInputChange}
                     />
-                  </Button>
-                </div> : null}
-              </div>
-
-              <div className="custom-block bg-white">
-                <h5 className="mb-4" style={{ textAlign: 'center' }}>List Shop</h5>
-
-                <div className="table-responsive">
-                  <table className="account-table table" style={{ textAlign: 'center' }}>
-                    <thead>
-                      <tr>
-                        <th className='text-base' scope="col">Number</th>
-                        <th className='text-base' scope="col">ID</th>
-                        <th className='text-base' scope="col">Img</th>
-                        <th className='text-base' scope="col">Name</th>
-                        <th className='text-base' scope="col">Description</th>
-                        <th className='text-base' scope="col">Area</th>
-                        <th className='text-base' scope="col">Status</th>
-                        <th className='text-base' scope="col">View</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredData.map((item, index) => {
-                        return (
-                          <tr key={index}>
-                            <td className='font-bold text-base'>{index + 1}</td>
-                            <td className='text-base'>{item.id}</td>
-                            <img src={item.image} className='h-32 w-32 mx-auto' />
-                            <td className='text-base'>{item.name}</td>
-                            <td className='text-base'>{item.des}</td>
-                            <td className='text-base'>{item.area}</td>
-                            <td >{item.status == true ? <Tooltip title="Public">
-                              <IconButton >
-                                <PublicIcon className="" />
-                              </IconButton>
-                            </Tooltip>
-                              : <Tooltip title="Non Public">
+                    <IconButton className='' sx={{ p: '10px', outline: "none" }} >
+                      <SearchIcon />
+                    </IconButton>
+                  </Paper> */}
+                  <h5 className="mb-4 clear-right" style={{ textAlign: 'center' }}>List Shop</h5>
+                  <div className="table-responsive">
+                    <table className="account-table table" style={{ textAlign: 'center' }}>
+                      <thead>
+                        <tr>
+                          <th className='text-base' scope="col">Number</th>
+                          <th className='text-base' scope="col">ID</th>
+                          <th className='text-base' scope="col">Img</th>
+                          <th className='text-base' scope="col">Name</th>
+                          <th className='text-base' scope="col">Description</th>
+                          <th className='text-base' scope="col">Area</th>
+                          <th className='text-base' scope="col">Status</th>
+                          <th className='text-base' scope="col">View</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredData && filteredData.map((item, index) => {
+                          return (
+                            <tr key={index}>
+                              <td className='font-bold text-base'>{index + 1}</td>
+                              <td className='text-base'>{item.id}</td>
+                              <img src={item.image} className='h-32 w-32 mx-auto' />
+                              <td className='text-base'>{item.name}</td>
+                              <td className='text-base'>{item.des}</td>
+                              <td className='text-base'>{item.area}</td>
+                              <td >{item.status == true ? <Tooltip title="Public">
                                 <IconButton >
-                                  <PublicOffIcon className="" />
+                                  <PublicIcon className="" />
                                 </IconButton>
                               </Tooltip>
-                            } </td>
-                            <td className=''>
-                              <Tooltip title="Product">
-                                <Link to={{
-                                  pathname: `/shopadmin/${item.id}`,
-
-                                }}
-                                  state={param.id}
-                                >
+                                : <Tooltip title="Non Public">
                                   <IconButton >
-                                    <RemoveRedEyeIcon className="" />
+                                    <PublicOffIcon className="" />
                                   </IconButton>
-                                </Link>
-                              </Tooltip>
-                              <Tooltip onClick={() => handleClickOpen(item)} title="Edit">
-                                <IconButton >
-                                  <EditIcon className="" />
-                                </IconButton>
-                              </Tooltip>
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-                <div className="custom-block bg-white">
+                                </Tooltip>
+                              } </td>
+                              <td className=''>
+                                <Tooltip title="Product">
+                                  <Link to={{
+                                    pathname: `/shopadmin/${item.id}`,
+                                  }}
+                                    state={{ id: param.id, eventName: eventCotent.name, shopDetail: item }}
+                                  >
+                                    <IconButton >
+                                      <RemoveRedEyeIcon className="" />
+                                    </IconButton>
+                                  </Link>
+                                </Tooltip>
+                                <Tooltip onClick={() => handleClickOpen(item)} title="Edit">
+                                  <IconButton >
+                                    <EditIcon className="" />
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip onClick={() => handleClickOpenOrder(item)} title="Order">
+                                  <IconButton >
+                                    < FactCheckOutlinedIcon className="" />
+                                  </IconButton>
+                                </Tooltip>
+
+                              </td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </CustomTabPanel>
+                <CustomTabPanel value={value} index={1}>
+
                   <h5 className="mb-4" style={{ textAlign: 'center' }}>List Card</h5>
 
                   <div className="table-responsive">
@@ -537,8 +605,10 @@ function EventAdmin() {
                       </tbody>
                     </table>
                   </div>
-                </div>
-              </div>
+                </CustomTabPanel>
+
+              </Box>
+
             </div>
             <div className="col-2">
               <Link className="nav-link form-control mb-3" style={{ textAlign: 'center' }} to="/Admin">
@@ -648,73 +718,106 @@ function EventAdmin() {
           </Button>
         </DialogActions>
       </Dialog>
-      {/* <Dialog
-        open={openCard}
-        TransitionComponent={Transition}
-        keepMounted
+      <Dialog
+        open={isImg}
+        onClose={handleClickOpenClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
         fullWidth
-        maxWidth="sm"
-        className=""
-        onClose={handleCloseCard}
-        aria-describedby="alert-dialog-slide-description"
+        size="xl"
       >
-        <table className="account-table table" style={{ textAlign: 'center' }}>
-          <thead>
-            <tr>
-              <th scope="col">Number</th>
-              <th scope="col">ID</th>
-              <th scope="col">Name</th>
-              <th scope="col">Description</th>
-              <th scope="col">Area</th>
-              <th scope="col">Status</th>
-              <th scope="col">View</th>
-            </tr>
-          </thead>
-          <tbody>
-            {CardList.map((item, index) => {
-              return (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>{item.id}</td>
-                  <td>{item.name}</td>
-                  <td>{item.des}</td>
-                  <td>{item.area}</td>
-                  <td>{item.status == true ? <Tooltip title="Public">
-                    <IconButton >
-                      <PublicIcon className="" />
-                    </IconButton>
-                  </Tooltip>
-                    : <Tooltip title="Non Public">
-                      <IconButton >
-                        <PublicOffIcon className="" />
-                      </IconButton>
-                    </Tooltip>
-                  } </td>
-                  <td className='flex text-center justify-center items-center mx-auto'>
-                    <Tooltip title="Product">
-                      <Link to={{
-                        pathname: `/shopadmin/${item.id}`,
+        <DialogTitle id="alert-dialog-title">
+          {"Upload Image"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {isImg == true ? <div className='w-48'>
+              <Button
+                variant="contained"
+                component="label"
+                className='nav-link form-control mb-3 w-48'
+              >
+                Upload Image
+                <input
+                  type="file"
+                  hidden
+                  onChange={(event) => {
+                    setSelectedImage(event.target.files[0]);
+                    SetClick(true);
+                  }}
+                />
+              </Button>
+            </div> : null}
+            {isImg && selectedImage !== undefined && (
+              <>
+                <img
+                  alt=""
+                  className="mx-auto h-96 w-96 object-cover my-2"
+                  src={
+                    click === false
+                      ? selectedImage
+                      : window.URL.createObjectURL(selectedImage)
+                  }
+                />
+                <Button
+                  variant="contained"
+                  component="label"
+                  onClick={HandleUploadImgEvent}
+                >
+                  Update
+                </Button>
+              </>
+            )}
+          </DialogContentText>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={openOrder}
+        onClose={handleCloseOrder}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        fullWidth
+        size="xl"
+      >
+        <DialogTitle id="" >
+          List Order
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            <div className="table-responsive">
+              <table className="account-table table" style={{ textAlign: 'center' }}>
+                <thead>
+                  <tr>
+                    <th className='text-base' scope="col">Number</th>
+                    <th className='text-base' scope="col">ID</th>
+                    <th className='text-base' scope="col">Shop Id</th>
+                    <th className='text-base' scope="col">Card Id</th>
+                    <th className='text-base' scope="col">Time</th>
+                    <th className='text-base' scope="col">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {OrerList && OrerList.map((item, index) => {
+                    return (
+                      <tr key={index}>
+                        <td className='font-bold text-base'>{index + 1}</td>
+                        <td className='text-base'>{item.id}</td>
+                        <td className='text-base'>{item.shopId}</td>
+                        <td className='text-base'>{item.cardId}</td>
+                        <td className='text-base'>{parseTimestamp(item.beginDate)}</td>
+                        <td className=''>
+                          {parseToVND(item.total) + " Vnđ"}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </DialogContentText>
+        </DialogContent>
+      </Dialog>
 
-                      }}
-                        state={param.id}
-                      >
-                        <IconButton >
-                          <RemoveRedEyeIcon className="" />
-                        </IconButton>
-                      </Link>
-                    </Tooltip>
-                    <Tooltip title="Card">
-                      <IconButton >
-                        <ViewCarouselIcon className="" />
-                      </IconButton>
-                    </Tooltip>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </Dialog> */}
     </div >
   );
 }

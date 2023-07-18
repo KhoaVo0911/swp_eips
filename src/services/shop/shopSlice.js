@@ -1,12 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { useNavigate } from "react-router-dom";
-import GetShopApi, { GetShopByUsernameApi, PostShopApi, PutShopApi } from "../../api/ShopApi";
+import GetShopApi, { GetListOrderApi, GetShopByUsernameApi, PostShopApi, PutShopApi } from "../../api/ShopApi";
 
 const getUserfromLocalStorage = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
 const initialState = {
     shopList: [],
     Shop: {},
-    shopByUsername: {}
+    shopByUsername: {},
+    OrerList: []
 };
 
 
@@ -54,6 +55,15 @@ const authSlice = createSlice({
                 state.shopByUsername = action.payload;
             })
             .addCase(getShopByUsernameAsyncApi.rejected, (state, action) => {
+            });
+        builder
+            .addCase(GetListOrderAsyncApi.pending, (state) => {
+            })
+            .addCase(GetListOrderAsyncApi.fulfilled, (state, action) => {
+                console.log("3", state, action.payload)
+                state.OrerList = action.payload;
+            })
+            .addCase(GetListOrderAsyncApi.rejected, (state, action) => {
             });
     },
 });
@@ -105,6 +115,19 @@ export const PutShopAsyncApi = createAsyncThunk(
     async (body) => {
         try {
             const response = await PutShopApi(body);
+            return response;
+        } catch (error) {
+            const json = error.response.data;
+            const errors = json[""].errors;
+            throw errors[0].errorMessage;
+        }
+    }
+);
+export const GetListOrderAsyncApi = createAsyncThunk(
+    'ShopReducer/getListOrderAsyncApi',
+    async (body) => {
+        try {
+            const response = await GetListOrderApi(body);
             return response;
         } catch (error) {
             const json = error.response.data;

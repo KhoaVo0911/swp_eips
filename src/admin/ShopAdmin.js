@@ -24,7 +24,7 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { GetAccountNotRelationAsyncApi, PostAccountAsyncApi, PostShopAccountSetAsyncApi, accountAction } from '../services/account/accountSlice';
+import { GetAccountNotRelationAsyncApi, PostAccountAsyncApi, PostAccountForSaleAsyncApi, PostShopAccountSetAsyncApi, accountAction } from '../services/account/accountSlice';
 import {
   InputLabel,
   MenuItem,
@@ -34,6 +34,7 @@ import {
 import dayjs from 'dayjs';
 import Navbar from './Navbar';
 import { EventAction } from '../services/event/eventSlice';
+import Typography from '@mui/material/Typography';
 
 function formatDate(date) {
   const year = date.getFullYear();
@@ -67,7 +68,7 @@ function ShopAdmin() {
   console.log("accountset", accountSet)
   const location = useLocation();
   const additionalData = location.state;
-  console.log('location', location);
+  console.log('location', additionalData);
   const handleDateStartChange = (date) => {
     const day = dayjs(date).format('YYYY-MM-DD');
     setSelectedDateStart(day);
@@ -158,9 +159,10 @@ function ShopAdmin() {
         username: values.username,
         password: values.password,
         name: values.name,
-        role: "sale"
+        role: "sale",
+        shopId: param.id
       }
-      dispatch(PostAccountAsyncApi(DataBody)).then((response) => {
+      dispatch(PostAccountForSaleAsyncApi(DataBody)).then((response) => {
         setOpen(false);
         formik.setValues(
           {
@@ -194,18 +196,37 @@ function ShopAdmin() {
         <div className="row">
           <main className="main-wrapper ms-sm-auto py-4 px-md-4 border-start">
             <div className="row my-4">
-              <div className="col-lg-6 col-6">
+              <div className="col-lg-6 col-6 bg-white mb-4 p-2">
                 <div className="title-group mb-3" style={{ textAlign: 'center' }}>
-                  <h1 className="h2 mb-0">Name Shop</h1>
+                  <h3 className="h4 mb-0">{additionalData.eventName} - {additionalData.shopDetail.name}</h3>
+                  <div className='grid grid-cols-2'>
+                    <div>
+                      <img src={additionalData.shopDetail.image} className='h-32 w-32 mx-auto  mt-[18px]' />
+                    </div>
+                    <div className='text-left'>
+                      <Typography variant="h6">
+                        <strong>Id:</strong>    {additionalData.shopDetail.id}
+                      </Typography>
+                      <Typography variant="h6">
+                        <strong>Event Id:</strong>    {additionalData.shopDetail.eventId}
+                      </Typography>
+                      <Typography variant="h6">
+                        <strong>Area:</strong> {additionalData.shopDetail.area}
+                      </Typography>
+                      <Typography variant="h6">
+                        <strong>Description:</strong>{additionalData.shopDetail.des}
+                      </Typography>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="col-lg-6 col-6" style={{ paddingRight: '300px' }}>
-                <form className="custom-form input-group mb-3" action="#" method="get" role="form">
+                {/* <form className="custom-form input-group mb-3" action="#" method="get" role="form">
                   <input onChange={handleSearchInputChange} className="form-control" name="search" type="text" placeholder="Search" aria-label="Search" />
                   <button style={{ width: '100px' }} type="submit">
                     Search
                   </button>
-                </form>
+                </form> */}
                 <div>
                   <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={handleClickOpen}>
                     Create Account
@@ -338,7 +359,7 @@ function ShopAdmin() {
             <div className='max-w-5xl my-2 mx-auto'>
               <TextField id="outlined-basic"
                 className='w-full' disabled value="sale" label="role" variant="outlined"
-                 />
+              />
             </div>
           </DialogContent>
           <DialogActions>

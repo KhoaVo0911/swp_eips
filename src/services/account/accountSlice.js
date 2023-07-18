@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { useNavigate } from "react-router-dom";
-import GetAccountApi, { GetAccountNotRelationApi, GetShopAccountApi, PostAccountApi, PostShopAccountApi, PutAccountApi, postShopAccountSetApi } from "../../api/AccountApi";
+import GetAccountApi, { GetAccountNotRelationApi, GetShopAccountApi, PostAccountApi, PostAccountForSaleApi, PostShopAccountApi, PutAccountApi, postShopAccountSetApi } from "../../api/AccountApi";
 
 const getUserfromLocalStorage = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
 const initialState = {
@@ -57,6 +57,14 @@ const authSlice = createSlice({
                 console.log("3", state, action.payload)
             })
             .addCase(PostShopAccountAsyncApi.rejected, (state, action) => {
+            });
+        builder
+            .addCase(PostAccountForSaleAsyncApi.pending, (state) => {
+            })
+            .addCase(PostAccountForSaleAsyncApi.fulfilled, (state, action) => {
+                console.log("3", state, action.payload)
+            })
+            .addCase(PostAccountForSaleAsyncApi.rejected, (state, action) => {
             });
         builder
             .addCase(PostShopAccountSetAsyncApi.pending, (state) => {
@@ -119,6 +127,19 @@ export const PostAccountAsyncApi = createAsyncThunk(
     async (body) => {
         try {
             const response = await PostAccountApi(body);
+            return response;
+        } catch (error) {
+            const json = error.response.data;
+            const errors = json[""].errors;
+            throw errors[0].errorMessage;
+        }
+    }
+);
+export const PostAccountForSaleAsyncApi = createAsyncThunk(
+    'AccountReducer/postAccountForSaleAsyncApi',
+    async (body) => {
+        try {
+            const response = await PostAccountForSaleApi(body);
             return response;
         } catch (error) {
             const json = error.response.data;

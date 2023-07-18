@@ -9,6 +9,8 @@ import SimpleSlider from "./SimpleSlider";
 import { EventAction, getEventImgListAsyncApi } from "../services/event/eventSlice";
 import { accountAction } from "../services/account/accountSlice";
 import { CardAction } from "../services/card/cardSlice";
+import Button from '@mui/material/Button';
+import { Link } from 'react-router-dom'
 
 function parseToVND(number) {
   let strNumber = number.toString().replace(/[.,]/g, "");
@@ -24,7 +26,7 @@ export default function ShopOrder() {
   const dispatch = useDispatch();
   const { ProductOfSale } = useSelector((state) => state.product)
   const { arrCart } = useSelector((state) => state.cart)
-  const handleClickAddToCart = (index) => {   
+  const handleClickAddToCart = (index) => {
     dispatch(cartAction.addTocart(
       {
         quantity: parseInt(filteredData[index].quantity),
@@ -35,7 +37,7 @@ export default function ShopOrder() {
         image: filteredData[index].img,
       }
     ))
-     
+
   };
 
   console.log("cart", arrCart)
@@ -85,7 +87,18 @@ export default function ShopOrder() {
       <Navbar />
       <SimpleSlider />
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-        <h3 className=" font-bold  mb-0">PRODUCT</h3>
+        <div class="flex justify-between items-center">
+          <h3 class="font-bold mb-0">PRODUCT</h3>
+          <div class="border-2 rounded-full w-12 h-12 p-[10px] cursor-pointer flex justify-center items-center border-black">
+            <Link
+              to="/Cart"
+              className="text-black"
+            >
+              <ShoppingCartOutlinedIcon />
+            </Link>
+            <button className="h-6 w-6 bg-blue-400 rounded-full absolute -mt-10 ml-6">{arrCart.length}</button>
+          </div>
+        </div>
         <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 ">
           {filteredData && filteredData.map((product, index) => (
             <div key={index} className="  border-2 p-2 ">
