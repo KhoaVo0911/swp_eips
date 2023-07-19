@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { useNavigate } from "react-router-dom";
-import GetEventApi, { GetEventByShopApi, GetEventImgListApi, PostEventApi, PostImgEventApi, PutEventApi } from "../../api/EventApi";
+import GetEventApi, { GetEventByIdApi, GetEventByShopApi, GetEventImgListApi, PostEventApi, PostImgEventApi, PutEventApi } from "../../api/EventApi";
 
 const getUserfromLocalStorage = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
 const initialState = {
@@ -8,6 +8,7 @@ const initialState = {
     eventListImg: [],
     event: {},
     eventByShop: {},
+    eventById: {}
 };
 
 
@@ -49,7 +50,7 @@ const authSlice = createSlice({
             })
             .addCase(PostEventAsyncApi.rejected, (state, action) => {
             });
-            builder
+        builder
             .addCase(PostImgEventAsyncApi.pending, (state) => {
             })
             .addCase(PostImgEventAsyncApi.fulfilled, (state, action) => {
@@ -73,6 +74,15 @@ const authSlice = createSlice({
                 state.eventByShop = action.payload;
             })
             .addCase(getEventByShopAsyncApi.rejected, (state, action) => {
+            });
+        builder
+            .addCase(getEventByIdAsyncApi.pending, (state) => {
+            })
+            .addCase(getEventByIdAsyncApi.fulfilled, (state, action) => {
+                console.log("3", state, action.payload.role)
+                state.eventById = action.payload;
+            })
+            .addCase(getEventByIdAsyncApi.rejected, (state, action) => {
             });
     },
 });
@@ -98,6 +108,19 @@ export const getEventByShopAsyncApi = createAsyncThunk(
     async (id) => {
         try {
             const response = await GetEventByShopApi(id);
+            return response;
+        } catch (error) {
+            const json = error.response.data;
+            const errors = json[""].errors;
+            throw errors[0].errorMessage;
+        }
+    }
+);
+export const getEventByIdAsyncApi = createAsyncThunk(
+    'eventReducer/getByEventByIdAsyncApi',
+    async (id) => {
+        try {
+            const response = await GetEventByIdApi(id);
             return response;
         } catch (error) {
             const json = error.response.data;

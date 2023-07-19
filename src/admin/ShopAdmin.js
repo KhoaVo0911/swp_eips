@@ -33,7 +33,7 @@ import {
 } from "@mui/material";
 import dayjs from 'dayjs';
 import Navbar from './Navbar';
-import { EventAction } from '../services/event/eventSlice';
+import { EventAction, getEventByIdAsyncApi } from '../services/event/eventSlice';
 import Typography from '@mui/material/Typography';
 
 function formatDate(date) {
@@ -81,8 +81,14 @@ function ShopAdmin() {
   const dispatch = useDispatch();
   const { ProductList, Revenue } = useSelector((state) => state.product)
   const { AccountNotRelation } = useSelector((state) => state.acc)
+  const {  eventById } = useSelector((state) => state.event)
   useEffect(() => {
     dispatch(GetAccountNotRelationAsyncApi())
+    dispatch(getEventByIdAsyncApi(additionalData.id)).then((response) => {
+      if (response.payload != undefined) {
+      }
+    }).catch((error) => {
+    });
     dispatch(getProductAsyncApi(param.id)).then((response) => {
       if (response.payload != undefined) {
         setFilteredData(response.payload)
@@ -198,7 +204,7 @@ function ShopAdmin() {
             <div className="row my-4">
               <div className="col-lg-6 col-6 bg-white mb-4 p-2">
                 <div className="title-group mb-3" style={{ textAlign: 'center' }}>
-                  <h3 className="h4 mb-0">{additionalData.eventName} - {additionalData.shopDetail.name}</h3>
+                  <h3 className="h4 mb-0">{eventById.name} - {additionalData.shopDetail.name}</h3>
                   <div className='grid grid-cols-2'>
                     <div>
                       <img src={additionalData.shopDetail.image} className='h-32 w-32 mx-auto  mt-[18px]' />
@@ -318,7 +324,7 @@ function ShopAdmin() {
               </div>
             </div>
             <div className="col-2">
-              <Link className="nav-link form-control mb-3" style={{ textAlign: 'center' }} to={`/EventAdmin/${additionalData}`}>
+              <Link className="nav-link form-control mb-3" style={{ textAlign: 'center' }} to={`/EventAdmin/${additionalData.id}`}>
                 Previous
               </Link>
             </div>

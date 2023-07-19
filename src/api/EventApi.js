@@ -20,6 +20,15 @@ export const GetEventByShopApi = async (id) => {
   }
 };
 
+export const GetEventByIdApi = async (id) => {
+  try {
+    const response = await axios.get(`${API_URL}/admin/event/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const GetEventImgListApi = async (id) => {
   try {
     const response = await axios.get(`${API_URL}/general/img/${id}`);

@@ -24,7 +24,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Navbar from './Navbar';
 import EditIcon from '@mui/icons-material/Edit';
-import { EventAction, PostImgEventAsyncApi, getEventImgListAsyncApi } from '../services/event/eventSlice';
+import { EventAction, PostImgEventAsyncApi, getEventByIdAsyncApi, getEventImgListAsyncApi } from '../services/event/eventSlice';
 import {
   InputLabel,
   MenuItem,
@@ -114,7 +114,7 @@ function EventAdmin() {
   const dispatch = useDispatch();
   const [isUpdate, setIsUpdate] = React.useState(false);
   const [idShop, setIdShop] = React.useState(0);
-  const { eventListImg } = useSelector((state) => state.event)
+  const { eventListImg, eventById } = useSelector((state) => state.event)
   const { shopList, OrerList } = useSelector((state) => state.shop)
   const { CardList } = useSelector((state) => state.card)
   const [openUpdate, setOpenUpdate] = React.useState(false);
@@ -168,6 +168,12 @@ function EventAdmin() {
 
   useEffect(() => {
     console.log("haha1", param, location)
+    dispatch(getEventByIdAsyncApi(param.id)).then((response) => {
+      if (response.payload != undefined) {
+      }
+    }).catch((error) => {
+      // Handle failure case
+    });
     dispatch(getShopAsyncApi(param.id)).then((response) => {
       if (response.payload != undefined) {
         setFilteredData(response.payload)
@@ -451,27 +457,27 @@ function EventAdmin() {
                 </div>
                 <div className="pb-5">
 
-                  {eventCotent && <div className='bg-white px-4 py-1 mx-36'>
+                  {eventById && <div className='bg-white px-4 py-1 mx-36'>
                     <Typography gutterBottom variant="h4" className='text-center' >
-                      {eventCotent.name}
+                      {eventById.name}
                     </Typography>
                     <Typography variant="h6">
-                      <strong>ID:</strong>  {eventCotent.id}
+                      <strong>ID:</strong>  {eventById.id}
                     </Typography>
                     <Typography variant="h6">
-                      <strong>Area:</strong> {eventCotent.area}
+                      <strong>Area:</strong> {eventById.area}
                     </Typography>
                     <Typography variant="h6">
-                      <strong>Description:</strong>{eventCotent.description.length > 20 ? eventCotent.description.slice(0, 20) + '...' : eventCotent.description}
+                      <strong>Description:</strong>{eventById.description}
                     </Typography>
                     <Typography variant="h6">
-                      <strong>Begin Date:</strong> {parseTimestamp(eventCotent.beginDate)}
+                      <strong>Begin Date:</strong> {eventById.beginDate && parseTimestamp(eventById.beginDate)}
                     </Typography>
                     <Typography variant="h6">
-                      <strong>End Date:</strong> {parseTimestamp(eventCotent.endDate)}
+                      <strong>End Date:</strong> {eventById.endDate && parseTimestamp(eventById.endDate)}
                     </Typography>
                     <Typography variant="h6" className='flex gap-[2px]'>
-                      <strong>Status:</strong>  {eventCotent.status == true ? <span className='text-green-400'> true </span> : <span className='text-red-400'> false </span>}
+                      <strong>Status:</strong>  {eventById.status == true ? <span className='text-green-400'> true </span> : <span className='text-red-400'> false </span>}
                     </Typography>
                   </div>}
                 </div>
@@ -555,7 +561,7 @@ function EventAdmin() {
                                   <Link to={{
                                     pathname: `/shopadmin/${item.id}`,
                                   }}
-                                    state={{ id: param.id, eventName: eventCotent.name, shopDetail: item }}
+                                    state={{ id: param.id, shopDetail: item }}
                                   >
                                     <IconButton >
                                       <RemoveRedEyeIcon className="" />
