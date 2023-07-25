@@ -29,6 +29,14 @@ export const GetEventByIdApi = async (id) => {
   }
 };
 
+export const GetEventCashierApi = async (id) => {
+  try {
+    const response = await axios.get(`${API_URL}/admin/event`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 export const GetEventImgListApi = async (id) => {
   try {
     const response = await axios.get(`${API_URL}/general/img/${id}`);

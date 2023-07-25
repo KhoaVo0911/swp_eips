@@ -12,6 +12,9 @@ import AccountAdmin from "./admin/AccountAdmin";
 import SettingAdmin from "./admin/SettingAdmin";
 import Cart from "./pages/Cart";
 import SettingCashier from "./cashier/SettingCashier";
+import Order from "./pages/Order";
+import Event from "./cashier/Event";
+import EventDetails from "./cashier/EventDetails";
 
 function App() {
   return (
@@ -24,7 +27,13 @@ function App() {
         <Route path="/SettingAdmin" element={<SettingAdmin />} />
         <Route path="/Admin" element={<Admin />} />
         <Route path="/Cart" element={<Cart />} />
+        <Route path="/Order" element={<Order />} />
         <Route path="/EventAdmin" element={<EventAdmin />} >
+          <Route path=":id"></Route>
+        </Route>
+        <Route path="/Event" element={<Event />} >
+        </Route>
+        <Route path="/EventDetails" element={<EventDetails />} >
           <Route path=":id"></Route>
         </Route>
         <Route path="/ShopAdmin" element={<ShopAdmin />} >

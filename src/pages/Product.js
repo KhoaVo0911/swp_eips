@@ -550,9 +550,9 @@ function Product() {
                 </form>
                 <div className="my-4 float-right">
                   <Stack direction="row" spacing={2}>
-                    <Button onClick={handleClickOpenOrder} variant="contained" startIcon={<BarChartIcon />}>
+                    {/* <Button onClick={handleClickOpenOrder} variant="contained" startIcon={<BarChartIcon />}>
                       Order List
-                    </Button>
+                    </Button> */}
                     <Button onClick={handleClickOpen} color="success" variant="contained" startIcon={<AddIcon />}>
                       Create Product
                     </Button>
@@ -925,7 +925,7 @@ function Product() {
           </DialogActions>
         </form>
       </Dialog>
-      <Dialog
+      {/* <Dialog
         open={openOrder}
         onClose={handleCloseOrder}
         aria-labelledby="alert-dialog-title"
@@ -938,39 +938,10 @@ function Product() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            <div className="table-responsive">
-              <table className="account-table table" style={{ textAlign: 'center' }}>
-                <thead>
-                  <tr>
-                    <th className='text-base' scope="col">Number</th>
-                    <th className='text-base' scope="col">ID</th>
-                    <th className='text-base' scope="col">Shop Id</th>
-                    <th className='text-base' scope="col">Card Id</th>
-                    <th className='text-base' scope="col">Time</th>
-                    <th className='text-base' scope="col">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {OrerList.length > 0 && OrerList.map((item, index) => {
-                    return (
-                      <tr key={index}>
-                        <td className='font-bold text-base'>{index + 1}</td>
-                        <td className='text-base'>{item.id}</td>
-                        <td className='text-base'>{item.shopId}</td>
-                        <td className='text-base'>{item.cardId}</td>
-                        <td className='text-base'>{parseTimestamp(item.beginDate)}</td>
-                        <td className=''>
-                          {parseToVND(item.total) + " Vnđ"}
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
+           
           </DialogContentText>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </div >
   );
 }

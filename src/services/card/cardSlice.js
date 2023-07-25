@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { useNavigate } from "react-router-dom";
-import GetCardApi, { Post50CardApi, PostCardApi, PostSearchCardApi, PutCardApi, PutDepositCardApi, PutWithdrawCardApi } from "../../api/CardApi";
+import GetCardApi, { Post50CardApi, PostCardApi, PostSearchCardApi, PutCardApi, PutDepositCardApi, PutStatusCardAPi, PutWithdrawCardApi } from "../../api/CardApi";
 
 const getUserfromLocalStorage = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
 const initialState = {
@@ -25,7 +25,6 @@ const authSlice = createSlice({
             .addCase(getCardAsyncApi.pending, (state) => {
             })
             .addCase(getCardAsyncApi.fulfilled, (state, action) => {
-                console.log("3", state, action.payload.role)
                 state.CardList = action.payload;
             })
             .addCase(getCardAsyncApi.rejected, (state, action) => {
@@ -34,7 +33,6 @@ const authSlice = createSlice({
             .addCase(PostSearchCardAsyncApi.pending, (state) => {
             })
             .addCase(PostSearchCardAsyncApi.fulfilled, (state, action) => {
-                console.log("3", state, action.payload)
                 state.SearchCardList = action.payload;
             })
             .addCase(PostSearchCardAsyncApi.rejected, (state, action) => {
@@ -43,7 +41,6 @@ const authSlice = createSlice({
             .addCase(PostCardAsyncApi.pending, (state) => {
             })
             .addCase(PostCardAsyncApi.fulfilled, (state, action) => {
-                console.log("3", state, action.payload)
             })
             .addCase(PostCardAsyncApi.rejected, (state, action) => {
             });
@@ -51,7 +48,6 @@ const authSlice = createSlice({
             .addCase(PostCard50AsyncApi.pending, (state) => {
             })
             .addCase(PostCard50AsyncApi.fulfilled, (state, action) => {
-                console.log("3", state, action.payload)
             })
             .addCase(PostCard50AsyncApi.rejected, (state, action) => {
             });
@@ -59,7 +55,6 @@ const authSlice = createSlice({
             .addCase(PutCardAsyncApi.pending, (state) => {
             })
             .addCase(PutCardAsyncApi.fulfilled, (state, action) => {
-                console.log("3", state, action.payload)
             })
             .addCase(PutCardAsyncApi.rejected, (state, action) => {
             });
@@ -67,7 +62,6 @@ const authSlice = createSlice({
             .addCase(PutDepositAsyncApi.pending, (state) => {
             })
             .addCase(PutDepositAsyncApi.fulfilled, (state, action) => {
-                console.log("3", state, action.payload)
             })
             .addCase(PutDepositAsyncApi.rejected, (state, action) => {
             });
@@ -75,9 +69,15 @@ const authSlice = createSlice({
             .addCase(PutWithdrawAsyncApi.pending, (state) => {
             })
             .addCase(PutWithdrawAsyncApi.fulfilled, (state, action) => {
-                console.log("3", state, action.payload)
             })
             .addCase(PutWithdrawAsyncApi.rejected, (state, action) => {
+            });
+        builder
+            .addCase(PutStatusAsyncApi.pending, (state) => {
+            })
+            .addCase(PutStatusAsyncApi.fulfilled, (state, action) => {
+            })
+            .addCase(PutStatusAsyncApi.rejected, (state, action) => {
             });
     },
 });
@@ -177,3 +177,16 @@ export const PutWithdrawAsyncApi = createAsyncThunk(
     }
 );
 
+export const PutStatusAsyncApi = createAsyncThunk(
+    'CardReducer/putStatusAsyncApi',
+    async (body) => {
+        try {
+            const response = await PutStatusCardAPi(body);
+            return response;
+        } catch (error) {
+            const json = error.response.data;
+            const errors = json[""].errors;
+            throw errors[0].errorMessage;
+        }
+    }
+);

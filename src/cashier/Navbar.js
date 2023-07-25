@@ -25,6 +25,38 @@ export default function Navbar() {
                             src="https://scontent.xx.fbcdn.net/v/t1.15752-9/361118940_244896404978263_8023005535970704477_n.png?_nc_cat=102&ccb=1-7&_nc_sid=aee45a&_nc_ohc=b7MH118u1r0AX-U6cCx&_nc_ad=z-m&_nc_cid=0&_nc_ht=scontent.xx&oh=03_AdTc0570GlAZPKh8ZJpnBwqdB9VXAup3pJRRNIZtvXUmBA&oe=64D85491"
                         />
                     </Link>
+
+
+
+
+                    <NavLink
+                        style={({ isActive }) =>
+                            isActive ? { color: "#60a5fa" } : undefined
+                        }
+                        to="/Order"
+                        className="text-black"
+                    >
+                        <div className='flex'>
+                            <CategoryIcon className="mr-2" />
+                            <h6 className="">settings</h6>
+                        </div>
+
+
+                    </NavLink>
+                    <NavLink
+                        style={({ isActive }) =>
+                            isActive ? { color: "#60a5fa" } : undefined
+                        }
+                        to="/Order"
+                        className="text-black"
+                    >
+                        <div className='flex'>
+                            <SettingsIcon className="mr-2" />
+                            <h6 className="">SettingCashier</h6>
+                        </div>
+
+
+                    </NavLink>
                     <div className='flex'>
                         <NavLink
                             style={({ isActive }) =>

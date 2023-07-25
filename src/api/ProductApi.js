@@ -21,6 +21,26 @@ export const GetListProductApi = async (body) => {
   }
 };
 
+export const GetListOrderByEventApi = async (id) => {
+  try {
+    //const response = await axios.post(`${API_URL}/sale/product/all`, body);
+    const response = await axios.get(`${API_URL}/admin/order/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const GetListOrderByShopApi = async (body) => {
+  try {
+    //const response = await axios.post(`${API_URL}/sale/product/all`, body);
+    const response = await axios.post(`${API_URL}/sale/infoOrder`, body);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const GetListProductOfSaleApi = async (id) => {
   try {
     const response = await axios.get(`${API_URL}/general/${id}`);

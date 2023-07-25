@@ -18,7 +18,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import TextField from '@mui/material/TextField';
 import * as Yup from "yup";
-import { CardAction, PostCard50AsyncApi, PostCardAsyncApi, getCardAsyncApi } from '../services/card/cardSlice';
+import { CardAction, PostCard50AsyncApi, PostCardAsyncApi, PutStatusAsyncApi, getCardAsyncApi } from '../services/card/cardSlice';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -33,7 +33,7 @@ import {
 } from "@mui/material";
 import "./Slider.css"
 import { accountAction } from '../services/account/accountSlice';
-import { ProductAction } from '../services/product/productSlice';
+import { ProductAction, getOrderByEventAsyncApi } from '../services/product/productSlice';
 import DialogContentText from '@mui/material/DialogContentText';
 import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage"
 import { storage } from '../config/FireBaseConfig';
@@ -116,6 +116,7 @@ function EventAdmin() {
   const [idShop, setIdShop] = React.useState(0);
   const { eventListImg, eventById } = useSelector((state) => state.event)
   const { shopList, OrerList } = useSelector((state) => state.shop)
+  const { OrderByEvent } = useSelector((state) => state.product)
   const { CardList } = useSelector((state) => state.card)
   const [openUpdate, setOpenUpdate] = React.useState(false);
   const [update50Card, setUpdate50Card] = React.useState(0);
@@ -124,6 +125,7 @@ function EventAdmin() {
   const [selectedImage, setSelectedImage] = React.useState();
   const [progresspercent, setProgresspercent] = useState(0);
   const [openOrder, setOpenOrder] = useState(false);
+  const [updateState, setUpdateState] = useState();
 
   const handleClickOpenOrder = (data) => {
     setOpenOrder(true);
@@ -139,6 +141,11 @@ function EventAdmin() {
     setUpdate50Card(0)
   };
 
+  const handleClickUpdateStatus = (data) => {
+    setOpenUpdate(true);
+    setUpdate50Card(3)
+    setUpdateState(data)
+  };
 
   const handleClickOpenUpdate = (data) => {
     setOpenUpdate(true);
@@ -174,6 +181,13 @@ function EventAdmin() {
     }).catch((error) => {
       // Handle failure case
     });
+    dispatch(getOrderByEventAsyncApi(param.id)).then((response) => {
+      if (response.payload != undefined) {
+      }
+    }).catch((error) => {
+      // Handle failure case
+    });
+
     dispatch(getShopAsyncApi(param.id)).then((response) => {
       if (response.payload != undefined) {
         setFilteredData(response.payload)
@@ -225,6 +239,19 @@ function EventAdmin() {
       // Handle failure case
     });
   };
+  const hanleClickUpdateStatus = () => {
+    setOpenUpdate(false)
+    setUpdate50Card(0)
+    dispatch(PutStatusAsyncApi({ id: updateState.id, status: !updateState.status })).then((response) => {
+      if (response.payload != undefined) {
+        dispatch(getCardAsyncApi(param.id))
+        setUpdateState()
+      }
+    }).catch((error) => {
+      // Handle failure case
+    });
+  };
+
   const hanleClick50Card = () => {
     setOpenUpdate(false)
     setUpdate50Card(0)
@@ -488,6 +515,7 @@ function EventAdmin() {
                   <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                     <Tab label="Shop" {...a11yProps(0)} />
                     <Tab label="Card" {...a11yProps(1)} />
+                    <Tab label="Order" {...a11yProps(2)} />
                   </Tabs>
                 </Box>
                 <CustomTabPanel value={value} index={0}>
@@ -495,12 +523,6 @@ function EventAdmin() {
                   <div className='flex gap-5'>
                     <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={handleClickOpen}>
                       Create Shop
-                    </button>
-                    <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={() => handleClickOpenUpdate(1)}>
-                      Create Card
-                    </button>
-                    <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={() => handleClickOpenUpdate(2)}>
-                      Create 50 Cards
                     </button>
                     <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={() => handleClickOpenImage()}>
                       Add Img to Event
@@ -588,7 +610,14 @@ function EventAdmin() {
                   </div>
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={1}>
-
+                  <div className='flex gap-2'>
+                    <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={() => handleClickOpenUpdate(1)}>
+                      Create Card
+                    </button>
+                    <button className="nav-link form-control mb-3" style={{ textAlign: 'center' }} onClick={() => handleClickOpenUpdate(2)}>
+                      Create 50 Cards
+                    </button>
+                  </div>
                   <h5 className="mb-4" style={{ textAlign: 'center' }}>List Card</h5>
 
                   <div className="table-responsive">
@@ -597,10 +626,10 @@ function EventAdmin() {
                         <tr>
                           <th scope="col">Number</th>
                           <th scope="col">ID</th>
-                          <th scope="col">username</th>
-                          <th scope="col"> phoneNumber</th>
-                          <th scope="col">balance</th>
-
+                          <th scope="col">Username</th>
+                          <th scope="col"> Phone Number</th>
+                          <th scope="col">Balance</th>
+                          <th scope="col">Status</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -612,6 +641,17 @@ function EventAdmin() {
                               <td>{item.username == null ? null : item.username}</td>
                               <td>{item.phoneNumber == null ? null : item.phoneNumber}</td>
                               <td>{item.balance}</td>
+                              <td >{item.status == true ? <Tooltip onClick={(e) => handleClickUpdateStatus(item)} title="Public">
+                                <IconButton >
+                                  <PublicIcon className="" />
+                                </IconButton>
+                              </Tooltip>
+                                : <Tooltip onClick={(e) => handleClickUpdateStatus(item)} title="Non Public">
+                                  <IconButton >
+                                    <PublicOffIcon className="" />
+                                  </IconButton>
+                                </Tooltip>
+                              } </td>
                             </tr>
                           )
                         })}
@@ -619,7 +659,39 @@ function EventAdmin() {
                     </table>
                   </div>
                 </CustomTabPanel>
+                <CustomTabPanel value={value} index={2}>
+                 
+                  <h5 className="mb-4" style={{ textAlign: 'center' }}>List Order</h5>
 
+                  <div className="table-responsive">
+                    <table className="account-table table" style={{ textAlign: 'center' }}>
+                      <thead>
+                        <tr>
+                          <th scope="col">Number</th>
+                          <th scope="col">Id</th>
+                          <th scope="col">Card Id</th>
+                          <th scope="col">Shop Id </th>
+                          <th scope="col">Time </th>                       
+                          <th scope="col">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {OrderByEvent && OrderByEvent.map((item, index) => {
+                          return (
+                            <tr key={index}>
+                              <td>{index + 1}</td>
+                              <td>{item.id}</td>
+                              <td>{item.cardId}</td>
+                              <td>{item.shopId}</td>
+                              <td>{parseTimestamp(item.beginDate)}</td>
+                              <td >{parseToVND(item.total)} Vnđ</td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </CustomTabPanel>
               </Box>
 
             </div>
@@ -726,7 +798,7 @@ function EventAdmin() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseUpdate}>Disagree</Button>
-          <Button onClick={update50Card == 1 ? hanleClickCard : update50Card == 2 ? hanleClick50Card : handleCloseUpdate} autoFocus>
+          <Button onClick={update50Card == 1 ? hanleClickCard : update50Card == 2 ? hanleClick50Card : update50Card == 3 ? hanleClickUpdateStatus : handleCloseUpdate} autoFocus>
             Agree
           </Button>
         </DialogActions>

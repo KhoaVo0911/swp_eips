@@ -8,6 +8,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CategoryIcon from '@mui/icons-material/Category';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 
 export default function Navbar() {
     const handleOut = () => {
@@ -55,25 +56,25 @@ export default function Navbar() {
                         </div>
 
                     </NavLink>
-                    {/* <NavLink
-                        style={({ isActive }) =>
-                            isActive ? { color: "#60a5fa" } : undefined
-                        }
-                        to="/Cart"
-                        className="text-black"
-                    >
-                        <div className='flex'>
-                            <ShoppingCartOutlinedIcon className="mr-2" />
-                            <h6 className="">Cart</h6>
-                        </div>
-
-
-                    </NavLink> */}
                     <NavLink
                         style={({ isActive }) =>
                             isActive ? { color: "#60a5fa" } : undefined
                         }
-                        to="/Setting"
+                        to="/Order"
+                        className="text-black"
+                    >
+                        <div className='flex'>
+                            <ListAltIcon className="mr-2" />
+                            <h6 className="">Order</h6>
+                        </div>
+
+
+                    </NavLink>
+                    <NavLink
+                        style={({ isActive }) =>
+                            isActive ? { color: "#60a5fa" } : undefined
+                        }
+                        to="/Order"
                         className="text-black"
                     >
                         <div className='flex'>

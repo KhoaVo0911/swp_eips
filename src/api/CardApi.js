@@ -50,6 +50,14 @@ export const PutCardApi = async (body) => {
     throw error;
   }
 };
+export const PutStatusCardAPi = async (body) => {
+  try {
+    const response = await axios.post(`${API_URL}/admin/card/update`, body);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 export const PutDepositCardApi = async (body) => {
   try {
     const response = await axios.post(`${API_URL}/cashier/card/deposite`, body);

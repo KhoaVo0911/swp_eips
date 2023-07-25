@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { useNavigate } from "react-router-dom";
-import GetProductApi, { GetListProductApi, GetListProductOfSaleApi, GetProductSoldApi, PostComboProductApi, PostOrderApi, PostProductApi, PostRevenueApi, PutProductApi } from "../../api/ProductApi";
+import GetProductApi, { GetListOrderByEventApi, GetListOrderByShopApi, GetListProductApi, GetListProductOfSaleApi, GetProductSoldApi, PostComboProductApi, PostOrderApi, PostProductApi, PostRevenueApi, PutProductApi } from "../../api/ProductApi";
 import { GetAccountNotRelationApi } from "../../api/AccountApi";
 
 const getUserfromLocalStorage = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
@@ -9,6 +9,8 @@ const initialState = {
     ProductListAll: [],
     ProductSold: [],
     ProductOfSale: [],
+    OrderByEvent: [],
+    OrderByShop: [],
     Product: {},
     Revenue: 0,
 };
@@ -25,6 +27,8 @@ const authSlice = createSlice({
             state.ProductOfSale = [];
             state.Product = {};
             state.Revenue = 0;
+            state.OrderByEvent = [];
+            state.OrderByShop = [];
         },
     },
     extraReducers: (builder) => {
@@ -99,11 +103,27 @@ const authSlice = createSlice({
             .addCase(getAllProductAsyncApi.pending, (state) => {
             })
             .addCase(getAllProductAsyncApi.fulfilled, (state, action) => {
-                console.log("3", state, action.payload)
                 state.ProductListAll = action.payload;
             })
             .addCase(getAllProductAsyncApi.rejected, (state, action) => {
             });
+        builder
+            .addCase(getOrderByEventAsyncApi.pending, (state) => {
+            })
+            .addCase(getOrderByEventAsyncApi.fulfilled, (state, action) => {
+                state.OrderByEvent = action.payload;
+            })
+            .addCase(getOrderByEventAsyncApi.rejected, (state, action) => {
+            });
+        builder
+            .addCase(getOrderByShopAsyncApi.pending, (state) => {
+            })
+            .addCase(getOrderByShopAsyncApi.fulfilled, (state, action) => {
+                state.OrderByEvent = action.payload;
+            })
+            .addCase(getOrderByShopAsyncApi.rejected, (state, action) => {
+            });
+
     },
 });
 
@@ -115,6 +135,34 @@ export const getProductAsyncApi = createAsyncThunk(
     async (id) => {
         try {
             const response = await GetProductApi(id);
+            return response;
+        } catch (error) {
+            const json = error.response.data;
+            const errors = json[""].errors;
+            throw errors[0].errorMessage;
+        }
+    }
+);
+
+export const getOrderByEventAsyncApi = createAsyncThunk(
+    'ProductReducer/getOrderByEventAsyncApi',
+    async (id) => {
+        try {
+            const response = await GetListOrderByEventApi(id);
+            return response;
+        } catch (error) {
+            const json = error.response.data;
+            const errors = json[""].errors;
+            throw errors[0].errorMessage;
+        }
+    }
+);
+
+export const getOrderByShopAsyncApi = createAsyncThunk(
+    'ProductReducer/getOrderAsyncApi',
+    async (id) => {
+        try {
+            const response = await GetListOrderByShopApi(id);
             return response;
         } catch (error) {
             const json = error.response.data;

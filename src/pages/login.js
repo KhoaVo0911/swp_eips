@@ -76,7 +76,7 @@ function Login() {
               url = '/Admin';
               break;
             case 'cashier':
-              url = '/SettingCashier';
+              url = '/Event';
               break;
             default:
               url = '/';

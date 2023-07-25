@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { useNavigate } from "react-router-dom";
-import GetEventApi, { GetEventByIdApi, GetEventByShopApi, GetEventImgListApi, PostEventApi, PostImgEventApi, PutEventApi } from "../../api/EventApi";
+import GetEventApi, { GetEventByIdApi, GetEventByShopApi, GetEventCashierApi, GetEventImgListApi, PostEventApi, PostImgEventApi, PutEventApi } from "../../api/EventApi";
 
 const getUserfromLocalStorage = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
 const initialState = {
@@ -8,7 +8,8 @@ const initialState = {
     eventListImg: [],
     event: {},
     eventByShop: {},
-    eventById: {}
+    eventById: {},
+    eventCashier: [],
 };
 
 
@@ -84,6 +85,15 @@ const authSlice = createSlice({
             })
             .addCase(getEventByIdAsyncApi.rejected, (state, action) => {
             });
+        builder
+            .addCase(getEventCashierAsyncApi.pending, (state) => {
+            })
+            .addCase(getEventCashierAsyncApi.fulfilled, (state, action) => {
+                console.log("3", state, action.payload.role)
+                state.eventCashier = action.payload;
+            })
+            .addCase(getEventCashierAsyncApi.rejected, (state, action) => {
+            });
     },
 });
 
@@ -95,6 +105,19 @@ export const getEventAsyncApi = createAsyncThunk(
     async () => {
         try {
             const response = await GetEventApi();
+            return response;
+        } catch (error) {
+            const json = error.response.data;
+            const errors = json[""].errors;
+            throw errors[0].errorMessage;
+        }
+    }
+);
+export const getEventCashierAsyncApi = createAsyncThunk(
+    'eventReducer/getCashierAsyncApi',
+    async () => {
+        try {
+            const response = await GetEventCashierApi();
             return response;
         } catch (error) {
             const json = error.response.data;
