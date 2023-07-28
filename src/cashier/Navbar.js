@@ -42,7 +42,7 @@ export default function Navbar() {
             style={({ isActive }) =>
               isActive ? { color: "#60a5fa" } : undefined
             }
-            to="/Order"
+            to="/SettingCashier"
             className="text-black"
           >
             <div className="flex">
