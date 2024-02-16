@@ -1,10 +1,8 @@
-import axios from 'axios';
-
-const API_URL = 'http://14.225.207.4:8080/demo/api/v1';
+import axiosClient from "./axiosClient";
 
 const GetProductApi = async (id) => {
   try {
-    const response = await axios.get(`${API_URL}/admin/productInShop/${id}`);
+    const response = await axiosClient.get(`/admin/productInShop/${id}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -13,8 +11,8 @@ const GetProductApi = async (id) => {
 
 export const GetListProductApi = async (body) => {
   try {
-    //const response = await axios.post(`${API_URL}/sale/product/all`, body);
-    const response = await axios.get(`${API_URL}/general/${body}`);
+    //const response = await axios.post(`/sale/product/all`, body);
+    const response = await axiosClient.get(`/general/${body}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -23,8 +21,8 @@ export const GetListProductApi = async (body) => {
 
 export const GetListOrderByEventApi = async (id) => {
   try {
-    //const response = await axios.post(`${API_URL}/sale/product/all`, body);
-    const response = await axios.get(`${API_URL}/admin/order/${id}`);
+    //const response = await axios.post(`/sale/product/all`, body);
+    const response = await axiosClient.get(`/admin/order/${id}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -33,8 +31,8 @@ export const GetListOrderByEventApi = async (id) => {
 
 export const GetListOrderByShopApi = async (body) => {
   try {
-    //const response = await axios.post(`${API_URL}/sale/product/all`, body);
-    const response = await axios.post(`${API_URL}/sale/infoOrder`, body);
+    //const response = await axios.post(`/sale/product/all`, body);
+    const response = await axiosClient.post(`/sale/infoOrder`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -43,7 +41,7 @@ export const GetListOrderByShopApi = async (body) => {
 
 export const GetListProductOfSaleApi = async (id) => {
   try {
-    const response = await axios.get(`${API_URL}/general/${id}`);
+    const response = await axiosClient.get(`/general/${id}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -52,7 +50,7 @@ export const GetListProductOfSaleApi = async (id) => {
 
 export const GetProductSoldApi = async (id) => {
   try {
-    const response = await axios.get(`${API_URL}/sale/checkProductSold/${id}`);
+    const response = await axios.get(`/sale/checkProductSold/${id}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -61,7 +59,7 @@ export const GetProductSoldApi = async (id) => {
 
 export const PostRevenueApi = async (body) => {
   try {
-    const response = await axios.post(`${API_URL}/general/viewRevenue`, body);
+    const response = await axios.post(`/general/viewRevenue`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -69,7 +67,7 @@ export const PostRevenueApi = async (body) => {
 };
 export const PutProductApi = async (body) => {
   try {
-    const response = await axios.post(`${API_URL}/sale/product/update`, body);
+    const response = await axios.post(`/sale/product/update`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -77,7 +75,7 @@ export const PutProductApi = async (body) => {
 };
 export const PostProductApi = async (body) => {
   try {
-    const response = await axios.post(`${API_URL}/sale/product/createProduct`, body);
+    const response = await axios.post(`/sale/product/createProduct`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -85,7 +83,7 @@ export const PostProductApi = async (body) => {
 };
 export const PostComboProductApi = async (body) => {
   try {
-    const response = await axios.post(`${API_URL}/sale/product/createCombo`, body);
+    const response = await axios.post(`/sale/product/createCombo`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -93,7 +91,7 @@ export const PostComboProductApi = async (body) => {
 };
 export const PostOrderApi = async (body) => {
   try {
-    const response = await axios.post(`${API_URL}/sale/order`, body);
+    const response = await axios.post(`/sale/order`, body);
     return response.data;
   } catch (error) {
     throw error;
