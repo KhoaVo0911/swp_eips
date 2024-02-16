@@ -50,7 +50,7 @@ export const GetListProductOfSaleApi = async (id) => {
 
 export const GetProductSoldApi = async (id) => {
   try {
-    const response = await axios.get(`/sale/checkProductSold/${id}`);
+    const response = await axiosClient.get(`/sale/checkProductSold/${id}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -59,7 +59,7 @@ export const GetProductSoldApi = async (id) => {
 
 export const PostRevenueApi = async (body) => {
   try {
-    const response = await axios.post(`/general/viewRevenue`, body);
+    const response = await axiosClient.post(`/general/viewRevenue`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -67,7 +67,7 @@ export const PostRevenueApi = async (body) => {
 };
 export const PutProductApi = async (body) => {
   try {
-    const response = await axios.post(`/sale/product/update`, body);
+    const response = await axiosClient.post(`/sale/product/update`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -75,7 +75,7 @@ export const PutProductApi = async (body) => {
 };
 export const PostProductApi = async (body) => {
   try {
-    const response = await axios.post(`/sale/product/createProduct`, body);
+    const response = await axiosClient.post(`/sale/product/createProduct`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -83,7 +83,7 @@ export const PostProductApi = async (body) => {
 };
 export const PostComboProductApi = async (body) => {
   try {
-    const response = await axios.post(`/sale/product/createCombo`, body);
+    const response = await axiosClient.post(`/sale/product/createCombo`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -91,7 +91,7 @@ export const PostComboProductApi = async (body) => {
 };
 export const PostOrderApi = async (body) => {
   try {
-    const response = await axios.post(`/sale/order`, body);
+    const response = await axiosClient.post(`/sale/order`, body);
     return response.data;
   } catch (error) {
     throw error;

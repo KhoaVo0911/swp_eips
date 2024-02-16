@@ -1,6 +1,5 @@
 import axios from "axios";
 
-
 axios.defaults.baseURL = "http://54.254.255.27:8080/demo/api/v1";
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
@@ -53,7 +52,9 @@ export const axiosClient = {
   },
 
   getWith2IdParams(url, slug = "", slug2 = "") {
-    return axios.get(`${url}/${slug}/${slug2}`).catch((error) => console.log(error));
+    return axios
+      .get(`${url}/${slug}/${slug2}`)
+      .catch((error) => console.log(error));
   },
   // getWithFilterMiddleId(url, url2, slug = "", params) {
   //   return axios
@@ -86,7 +87,7 @@ export const axiosClient = {
   put(url, params, config) {
     return axios.put(`${url}`, params, config);
   },
-  putWithId(url, slug="", params) {
+  putWithId(url, slug = "", params) {
     return axios.put(`${url}`, slug, params);
   },
   putWithIdAndParams(url, slug, params) {
