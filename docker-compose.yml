@@ -1,0 +1,7 @@
+version: "3"
+services:
+  eisp-fe:
+    container_name: eisp-fe
+    build: .
+    ports:
+      - "3000:80"
