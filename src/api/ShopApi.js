@@ -1,8 +1,10 @@
-import axiosClient from "./axiosClient";
+import axios from 'axios';
+
+const API_URL = 'http://52.74.214.224:8080/demo/api/v1';
 
 const GetShopApi = async (id) => {
   try {
-    const response = await axiosClient.get(`/admin/shop/${id}`);
+    const response = await axios.get(`${API_URL}/admin/shop/${id}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -11,7 +13,7 @@ const GetShopApi = async (id) => {
 
 export const GetShopByUsernameApi = async (id) => {
   try {
-    const response = await axiosClient.get(`/sale/info/shop/${id}`);
+    const response = await axios.get(`${API_URL}/sale/info/shop/${id}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -20,7 +22,7 @@ export const GetShopByUsernameApi = async (id) => {
 
 export const PostShopApi = async (body) => {
   try {
-    const response = await axiosClient.post(`/admin/shop`, body);
+    const response = await axios.post(`${API_URL}/admin/shop`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -28,7 +30,7 @@ export const PostShopApi = async (body) => {
 };
 export const PutShopApi = async (body) => {
   try {
-    const response = await axiosClient.post(`/admin/shop/update`, body);
+    const response = await axios.post(`${API_URL}/admin/shop/update`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -36,7 +38,7 @@ export const PutShopApi = async (body) => {
 };
 export const GetListOrderApi = async (id) => {
   try {
-    const response = await axiosClient.get(`/general/order/${id}`);
+    const response = await axios.get(`${API_URL}/general/order/${id}`);
     return response.data;
   } catch (error) {
     throw error;

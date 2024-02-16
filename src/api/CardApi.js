@@ -1,8 +1,10 @@
-import axiosClient from "./axiosClient";
+import axios from 'axios';
+
+const API_URL = 'http://52.74.214.224:8080/demo/api/v1';
 
 const GetCardApi = async (id) => {
   try {
-    const response = await axiosClient.get(`/admin/card/${id}`);
+    const response = await axios.get(`${API_URL}/admin/card/${id}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -16,7 +18,7 @@ export const PostSearchCardApi = async (id) => {
         'Content-Type': 'application/json', // Đặt Media Type là application/json
       },
     };
-    const response = await axiosClient.post(`/general/cardInfo`, id, config);
+    const response = await axios.post(`${API_URL}/general/cardInfo`, id, config);
     return response.data;
   } catch (error) {
     throw error;
@@ -25,7 +27,7 @@ export const PostSearchCardApi = async (id) => {
 
 export const PostCardApi = async (body) => {
   try {
-    const response = await axiosClient.post(`/admin/card/create`, body);
+    const response = await axios.post(`${API_URL}/admin/card/create`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -34,7 +36,7 @@ export const PostCardApi = async (body) => {
 
 export const Post50CardApi = async (body) => {
   try {
-    const response = await axiosClient.post(`/admin/card/create50`, body);
+    const response = await axios.post(`${API_URL}/admin/card/create50`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -42,7 +44,7 @@ export const Post50CardApi = async (body) => {
 };
 export const PutCardApi = async (body) => {
   try {
-    const response = await axiosClient.post(`/cashier/card/update`, body);
+    const response = await axios.post(`${API_URL}/cashier/card/update`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -50,7 +52,7 @@ export const PutCardApi = async (body) => {
 };
 export const PutStatusCardAPi = async (body) => {
   try {
-    const response = await axiosClient.post(`/admin/card/update`, body);
+    const response = await axios.post(`${API_URL}/admin/card/update`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -58,7 +60,7 @@ export const PutStatusCardAPi = async (body) => {
 };
 export const PutDepositCardApi = async (body) => {
   try {
-    const response = await axiosClient.post(`/cashier/card/deposite`, body);
+    const response = await axios.post(`${API_URL}/cashier/card/deposite`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -66,7 +68,7 @@ export const PutDepositCardApi = async (body) => {
 };
 export const PutWithdrawCardApi = async (body) => {
   try {
-    const response = await axiosClient.post(`/cashier/card/withdraw`, body);
+    const response = await axios.post(`${API_URL}/cashier/card/withdraw`, body);
     return response.data;
   } catch (error) {
     throw error;
