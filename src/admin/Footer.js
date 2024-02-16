@@ -11,10 +11,10 @@ export default function Footer() {
         <div className="text-sm mb-3 xl:text-left text-center  ">
           <img
             className="h-32 w-48 mt-1 xl:mx-0 mx-auto text-left  "
-            src="Image/Screenshot_2023-05-24_082524-removebg-preview.png"
+            src="Image/2021-FPTU-Eng.png"
             alt="Workflow"
           />
-          Power by Project @
+          Power by Project @EIPS
         </div>
         <div className="text-left mb-3">
           <h2 className="uppercase text-xl">Contact</h2>
@@ -23,17 +23,17 @@ export default function Footer() {
               {" "}
               Address:{" "}
               <a className="font-normal text-black">
-                Lô E2a-7, Đường D1, Đ. D1, Long Thạnh Mỹ, Thành Phố Thủ Đức, Thành
-                phố Hồ Chí Minh{" "}
+                Lô E2a-7, Đường D1, Đ. D1, Long Thạnh Mỹ, Thành Phố Thủ Đức,
+                Thành phố Hồ Chí Minh{" "}
               </a>
             </li>
             <li>
               {" "}
-              Phone: <a className="font-normal text-black"></a>
+              Phone: <a className="font-normal text-black">0399997857</a>
             </li>
             <li>
               {" "}
-              Email: <a className="font-normal text-black"></a>
+              Email: <a className="font-normal text-black">swp391_EIPS@fpt.edu.vn</a>
             </li>
           </ul>
           <div className="flex gap-4  justify-center lg:justify-start">
@@ -64,10 +64,11 @@ export default function Footer() {
               Information privacy policy
             </li>
             <li className="font-normal cursor-pointer">How it works</li>
-            <li className="font-normal cursor-pointer">Incidents and complaints</li>
+            <li className="font-normal cursor-pointer">
+              Incidents and complaints
+            </li>
           </ul>
         </div>
-
       </div>
     </>
   );
