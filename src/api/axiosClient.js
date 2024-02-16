@@ -1,7 +1,7 @@
 import axios from "axios";
 
 
-axios.defaults.baseURL = "http://54.254.255.27:8080/demo/api/v1";
+axios.defaults.baseURL = "http://52.74.214.224:8080/demo/api/v1";
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
 export const axiosClient = {
