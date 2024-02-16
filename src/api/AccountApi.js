@@ -1,10 +1,8 @@
-import axios from 'axios';
-
-const API_URL = 'http://14.225.207.4:8080/demo/api/v1';
+import axiosClient from "./axiosClient";
 
 const GetAccountApi = async () => {
   try {
-    const response = await axios.get(`${API_URL}/admin/account`);
+    const response = await axiosClient.get(`/admin/account`);
     return response.data;
   } catch (error) {
     throw error;
@@ -12,7 +10,7 @@ const GetAccountApi = async () => {
 };
 export const GetShopAccountApi = async () => {
   try {
-    const response = await axios.get(`${API_URL}/admin/setStatus`);
+    const response = await axiosClient.get(`/admin/setStatus`);
     return response.data;
   } catch (error) {
     throw error;
@@ -20,7 +18,7 @@ export const GetShopAccountApi = async () => {
 };
 export const postShopAccountSetApi = async (body) => {
   try {
-    const response = await axios.post(`${API_URL}/admin/setStatus/create`, body);
+    const response = await axiosClient.post(`/admin/setStatus/create`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -29,7 +27,7 @@ export const postShopAccountSetApi = async (body) => {
 
 export const GetAccountNotRelationApi = async () => {
   try {
-    const response = await axios.get(`${API_URL}/admin/account/notRelation`);
+    const response = await axiosClient.get(`/admin/account/notRelation`);
     return response.data;
   } catch (error) {
     throw error;
@@ -38,7 +36,7 @@ export const GetAccountNotRelationApi = async () => {
 
 export const PostShopAccountApi = async (body) => {
   try {
-    const response = await axios.post(`${API_URL}/admin/setStatus`, body);
+    const response = await axiosClient.post(`/admin/setStatus`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -48,7 +46,7 @@ export const PostShopAccountApi = async (body) => {
 
 export const PostAccountApi = async (body) => {
   try {
-    const response = await axios.post(`${API_URL}/admin/account`, body);
+    const response = await axiosClient.post(`/admin/account`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -56,7 +54,7 @@ export const PostAccountApi = async (body) => {
 };
 export const PostAccountForSaleApi = async (body) => {
   try {
-    const response = await axios.post(`${API_URL}/admin/account/set`, body);
+    const response = await axiosClient.post(`/admin/account/set`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -64,7 +62,7 @@ export const PostAccountForSaleApi = async (body) => {
 };
 export const PutAccountApi = async (body) => {
   try {
-    const response = await axios.post(`${API_URL}/admin/account/update`, body);
+    const response = await axiosClient.post(`/admin/account/update`, body);
     return response.data;
   } catch (error) {
     throw error;

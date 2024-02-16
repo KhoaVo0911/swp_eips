@@ -1,10 +1,8 @@
-import axios from 'axios';
-
-const API_URL = 'http://14.225.207.4:8080/demo/api/v1';
+import axiosClient from "./axiosClient";
 
 const GetEventApi = async () => {
   try {
-    const response = await axios.get(`${API_URL}/admin/event`);
+    const response = await axiosClient.get(`/admin/event`);
     return response.data;
   } catch (error) {
     throw error;
@@ -13,7 +11,7 @@ const GetEventApi = async () => {
 
 export const GetEventByShopApi = async (id) => {
   try {
-    const response = await axios.get(`${API_URL}/sale/info/event/${id}`);
+    const response = await axiosClient.get(`/sale/info/event/${id}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -22,7 +20,7 @@ export const GetEventByShopApi = async (id) => {
 
 export const GetEventByIdApi = async (id) => {
   try {
-    const response = await axios.get(`${API_URL}/admin/event/${id}`);
+    const response = await axiosClient.get(`/admin/event/${id}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -31,7 +29,7 @@ export const GetEventByIdApi = async (id) => {
 
 export const GetEventCashierApi = async (id) => {
   try {
-    const response = await axios.get(`${API_URL}/admin/event`);
+    const response = await axiosClient.get(`/admin/event`);
     return response.data;
   } catch (error) {
     throw error;
@@ -39,7 +37,7 @@ export const GetEventCashierApi = async (id) => {
 };
 export const GetEventImgListApi = async (id) => {
   try {
-    const response = await axios.get(`${API_URL}/general/img/${id}`);
+    const response = await axiosClient.get(`/general/img/${id}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -48,7 +46,7 @@ export const GetEventImgListApi = async (id) => {
 
 export const PostEventApi = async (body) => {
   try {
-    const response = await axios.post(`${API_URL}/admin/event`, body);
+    const response = await axiosClient.post(`/admin/event`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -56,7 +54,7 @@ export const PostEventApi = async (body) => {
 };
 export const PostImgEventApi = async (body) => {
   try {
-    const response = await axios.post(`${API_URL}/admin/image`, body);
+    const response = await axiosClient.post(`/admin/image`, body);
     return response.data;
   } catch (error) {
     throw error;
@@ -65,7 +63,7 @@ export const PostImgEventApi = async (body) => {
 
 export const PutEventApi = async (body) => {
   try {
-    const response = await axios.post(`${API_URL}/admin/event/update`, body);
+    const response = await axiosClient.post(`/admin/event/update`, body);
     return response.data;
   } catch (error) {
     throw error;
